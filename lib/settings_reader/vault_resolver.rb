@@ -1,4 +1,5 @@
 require "settings_reader/vault_resolver/version"
+require "settings_reader/vault_resolver/resolver"
 
 module SettingsReader
   module VaultResolver

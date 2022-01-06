@@ -8,4 +8,4 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: settings_reader-vault_resolver
+      VAULT_DEV_ROOT_TOKEN_ID: vault_resolver_token
