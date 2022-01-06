@@ -1,0 +1,11 @@
+# dependencies needed for development environment
+version: '3'
+services:
+  vault:
+    image: vault
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: settings_reader-vault_resolver
