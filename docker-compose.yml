@@ -8,4 +8,25 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: vault_resolver_token
+      VAULT_DEV_ROOT_TOKEN_ID: 'vault_root_token'
+  db:
+    image: postgres:14.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: 'vault_root'
+      POSTGRES_PASSWORD: 'root_password'
+      POSTGRES_DB: 'app_db'
+  init:
+    image: vault
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - vault
+      - db
+    volumes:
+      - './local/vault/setup.sh:/etc/vault/setup.sh'
+    environment:
+      VAULT_ADDR: 'http://vault:8200'
+      VAULT_TOKEN: 'vault_root_token'
+    command: sh /etc/vault/setup.sh
