@@ -6,18 +6,18 @@ module SettingsReader
       end
 
       def retrieve(address)
-        return nil unless (entry = @secrets[address.to_s])
+        return nil unless (entry = @secrets[cache_key(address)])
         return clear(entry) if entry.expired?
 
         entry
       end
 
       def save(entry)
-        @secrets[entry.address.to_s] = entry
+        @secrets[cache_key(entry.address)] = entry
       end
 
       def clear(entry)
-        @secrets.delete(entry.address.to_s)
+        @secrets.delete(cache_key(entry.address))
         nil
       end
 
@@ -29,8 +29,11 @@ module SettingsReader
         new_entry
       end
 
-      protected
+      private
 
+      def cache_key(address)
+        address.full_path
+      end
     end
   end
 end

@@ -14,6 +14,11 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
         is_expected.to eq(entry)
       end
 
+      it 'returns entry for another attribute' do
+        address = SettingsReader::VaultResolver::Address.new('vault://secret/key#another')
+        expect(cache.retrieve(address)).to eq(entry)
+      end
+
       it 'returns entry in far future' do
         Timecop.freeze do
           Timecop.travel 6000
@@ -44,6 +49,15 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
 
     context 'when not cached' do
       it { is_expected.to eq(nil) }
+    end
+
+    context 'when another address is cached' do
+      before { cache.save(entry) }
+
+      it 'returns nil' do
+        address = SettingsReader::VaultResolver::Address.new('vault://secret/another#attribute')
+        expect(cache.retrieve(address)).to eq(nil)
+      end
     end
   end
 end
