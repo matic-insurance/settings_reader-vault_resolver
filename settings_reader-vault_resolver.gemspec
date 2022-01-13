@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'concurrent-ruby', '~> 1.1'
-  spec.add_dependency 'consul_application_settings', '~> 4.0.0-alpha'
   spec.add_dependency 'vault', '~> 0.16'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
