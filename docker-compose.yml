@@ -5,10 +5,9 @@ services:
     image: vault
     ports:
       - "8200:8200"
-    cap_add:
-      - IPC_LOCK
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: 'vault_root_token'
+      SKIP_SETCAP: true
   db:
     image: postgres:14.1-alpine
     ports:
@@ -19,8 +18,6 @@ services:
       POSTGRES_DB: 'app_db'
   init:
     image: vault
-    cap_add:
-      - IPC_LOCK
     depends_on:
       - vault
       - db
@@ -29,4 +26,5 @@ services:
     environment:
       VAULT_ADDR: 'http://vault:8200'
       VAULT_TOKEN: 'vault_root_token'
+      SKIP_SETCAP: true
     command: sh /etc/vault/setup.sh
