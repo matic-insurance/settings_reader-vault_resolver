@@ -2,6 +2,7 @@ module SettingsReader
   module VaultResolver
     class Entry
       attr_reader :address, :secret
+      MONTH = 30 * 60 * 60
 
       def initialize(address, secret)
         @address = address
@@ -9,10 +10,34 @@ module SettingsReader
         @lease_started = Time.now
       end
 
-      def expired?
-        return false unless secret.lease_duration.to_i > 0
+      def leased?
+        @secret.lease_id && lease_duration.positive?
+      end
 
-        Time.now > @lease_started + secret.lease_duration
+      def expired?
+        return false unless leased?
+
+        Time.now > @lease_started + lease_duration
+      end
+
+      def expires_in
+        return MONTH unless leased?
+
+        @lease_started + lease_duration - Time.now
+      end
+
+      def renew
+        return unless leased?
+
+        @secret = Vault.sys.renew(@secret.lease_id)
+        @lease_started = Time.now
+        true
+      end
+
+      private
+
+      def lease_duration
+        @secret.lease_duration.to_i
       end
     end
   end

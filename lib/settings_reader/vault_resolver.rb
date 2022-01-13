@@ -3,6 +3,7 @@ require "settings_reader/vault_resolver/resolver"
 require "settings_reader/vault_resolver/address"
 require "settings_reader/vault_resolver/entry"
 require "settings_reader/vault_resolver/cache"
+require "settings_reader/vault_resolver/refresher"
 
 module SettingsReader
   module VaultResolver

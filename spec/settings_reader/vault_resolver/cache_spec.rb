@@ -2,7 +2,7 @@ require 'timecop'
 RSpec.describe SettingsReader::VaultResolver::Cache do
   subject(:cache) { described_class.new }
   let(:address) { SettingsReader::VaultResolver::Address.new('vault://secret/key#attribute') }
-  let(:secret) { instance_double(Vault::Secret, lease_duration: nil) }
+  let(:secret) { instance_double(Vault::Secret, lease_duration: nil, lease_id: nil) }
   let(:entry) { SettingsReader::VaultResolver::Entry.new(address, secret) }
 
   describe '.retrieve' do
@@ -28,7 +28,7 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
     end
 
     context 'when dynamic entry cached' do
-      let(:secret) { instance_double(Vault::Secret, lease_duration: 300) }
+      let(:secret) { instance_double(Vault::Secret, lease_duration: 300, lease_id: '123') }
 
       before { cache.save(entry) }
 
