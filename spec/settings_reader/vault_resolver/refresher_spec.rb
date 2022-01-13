@@ -10,7 +10,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
   context 'with static secrets' do
     before do
       allow(entry).to receive(:leased?).and_return false
-      refresher.call
+      refresher.refresh
     end
 
     it 'does not renew entry' do
@@ -26,7 +26,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
     context 'when up for renewal' do
       before do
         allow(entry).to receive(:expires_in).and_return 90
-        refresher.call
+        refresher.refresh
       end
 
       it 'renews entry' do
@@ -37,7 +37,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
     context 'when not time to renew' do
       before do
         allow(entry).to receive(:expires_in).and_return 150
-        refresher.call
+        refresher.refresh
       end
 
       it 'renews entry' do
