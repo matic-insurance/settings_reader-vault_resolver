@@ -36,7 +36,7 @@ RSpec.describe SettingsReader::VaultResolver::Resolver, :vault do
       end
 
       it 'returns preconfigured value' do
-        expect(resolver.resolve('vault://secret/preconfigured#foo', path)).to eq('a')
+        expect(resolver.resolve('vault://secret/pre-configured#foo', path)).to eq('a')
       end
 
       it 'returns nil for missing path' do
