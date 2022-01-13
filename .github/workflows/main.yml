@@ -21,7 +21,7 @@ jobs:
         ports:
           - "8200:8200"
         env:
-          VAULT_DEV_ROOT_TOKEN_ID: root_token
+          VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
           SKIP_SETCAP: true
       db:
         image: postgres:14.1-alpine
@@ -52,10 +52,9 @@ jobs:
         run: bundle install --path vendor/bundle
       - name: Set up Vault
         env:
-          VAULT_ADDR: 'http://vault:8200'
+          VAULT_ADDR: 'http://127.0.0.1:8200'
           VAULT_TOKEN: 'vault_root_token'
-          SKIP_SETCAP: true
-        run: docker run -v ./local/vault/setup.sh:/etc/vault/setup.sh vault sh /etc/vault/setup.sh
+        run: sh local/vault/setup.sh
 
       - name: Run specs
         env:

@@ -17,7 +17,7 @@ services:
       POSTGRES_PASSWORD: 'root_password'
       POSTGRES_DB: 'app_db'
   init:
-    image: vault
+    image: curlimages/curl
     depends_on:
       - vault
       - db
