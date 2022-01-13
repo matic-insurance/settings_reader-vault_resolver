@@ -47,7 +47,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Set up Bundler
-        run: gem install bundler:2.0.1
+        run: gem install bundler:2.1.4
       - name: Set up Dependencies
         run: bundle install --path vendor/bundle
       - name: Set up Vault
@@ -80,7 +80,7 @@ jobs:
         with:
           ruby-version: 2.7.x
       - name: Set up Bundler
-        run: gem install bundler:2.0.1
+        run: gem install bundler:2.1.4
       - name: Set up credentials
         run: |
           mkdir -p $HOME/.gem
