@@ -24,44 +24,44 @@ RSpec.describe SettingsReader::VaultResolver::Resolver, :vault do
     context 'k/v' do
       it 'returns value set in vault' do
         set_vault_value('test/app_secret', value: 'super_secret')
-        expect(resolver.resolve('vault://secret/test/app_secret?value', path)).to eq('super_secret')
+        expect(resolver.resolve('vault://secret/test/app_secret#value', path)).to eq('super_secret')
       end
 
       it 'returns preconfigured value' do
-        expect(resolver.resolve('vault://secret/preconfigured?foo', path)).to eq('a')
+        expect(resolver.resolve('vault://secret/preconfigured#foo', path)).to eq('a')
       end
 
       it 'returns nil for missing path' do
-        expect(resolver.resolve('vault://secret/unknown?test', path)).to eq(nil)
+        expect(resolver.resolve('vault://secret/unknown#test', path)).to eq(nil)
       end
 
       it 'returns nil for missing attribute' do
-        expect(resolver.resolve('vault://secret/test/app_secret?missing', path)).to eq(nil)
+        expect(resolver.resolve('vault://secret/test/app_secret#missing', path)).to eq(nil)
       end
     end
 
     context 'dynamic db secret' do
       it 'returns user name' do
-        value = resolver.resolve('vault://database/creds/app-user?username', path)
+        value = resolver.resolve('vault://database/creds/app-user#username', path)
         expect(value).to start_with('v-token-app-user-')
       end
 
       it 'returns password' do
-        value = resolver.resolve('vault://database/creds/app-user?password', path)
+        value = resolver.resolve('vault://database/creds/app-user#password', path)
         expect(value).not_to be(nil)
       end
 
       it 'returns nil for missing path' do
-        expect(resolver.resolve('vault://database/creds/unknown-db?username', path)).to eq(nil)
+        expect(resolver.resolve('vault://database/creds/unknown-db#username', path)).to eq(nil)
       end
 
       it 'returns nil for missing attribute' do
-        expect(resolver.resolve('vault://database/creds/app-user?missing', path)).to eq(nil)
+        expect(resolver.resolve('vault://database/creds/app-user#missing', path)).to eq(nil)
       end
     end
 
     it 'returns nil when env missing' do
-      expect(resolver.resolve('vault://secret/missing?value', path)).to eq(nil)
+      expect(resolver.resolve('vault://secret/missing#value', path)).to eq(nil)
     end
   end
 end

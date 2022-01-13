@@ -8,6 +8,11 @@ require "settings_reader/vault_resolver/refresher"
 module SettingsReader
   module VaultResolver
     class Error < StandardError; end
-    # Your code goes here...
+
+    class << self
+      attr_accessor :cache, :resolver
+    end
+
+    self.cache ||= SettingsReader::VaultResolver::Cache.new
   end
 end
