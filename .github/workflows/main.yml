@@ -1,0 +1,99 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ '2.5.x', '2.6.x', '2.7.x', '3.0.x' ]
+    services:
+      vault:
+        image: vault
+        ports:
+          - "8200:8200"
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: root_token
+          SKIP_SETCAP: true
+      db:
+        image: postgres:14.1-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: 'vault_root'
+          POSTGRES_PASSWORD: 'root_password'
+          POSTGRES_DB: 'app_db'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.OS }}-ruby-${{ matrix.ruby }}
+          restore-keys: ${{ runner.OS }}-
+
+      - name: Set up Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Set up Bundler
+        run: gem install bundler:2.0.1
+      - name: Set up Dependencies
+        run: bundle install --path vendor/bundle
+      - name: Set up Vault
+        env:
+          VAULT_ADDR: 'http://vault:8200'
+          VAULT_TOKEN: 'vault_root_token'
+          SKIP_SETCAP: true
+        run: docker run -v ./local/vault/setup.sh:/etc/vault/setup.sh vault sh /etc/vault/setup.sh
+
+      - name: Run specs
+        env:
+          COVERAGE: true
+        run: bundle exec rspec
+
+#      - name: Upload coverage
+#        env:
+#          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#        run: bash <(curl -s https://codecov.io/bash)
+
+#  release:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    if: github.event_name == 'release' && github.event.action == 'published'
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Set up Ruby
+#        uses: actions/setup-ruby@v1
+#        with:
+#          ruby-version: 2.6.x
+#      - name: Set up Bundler
+#        run: gem install bundler:2.0.1
+#      - name: Set up credentials
+#        run: |
+#          mkdir -p $HOME/.gem
+#          touch $HOME/.gem/credentials
+#          chmod 0600 $HOME/.gem/credentials
+#          printf -- "---\n:rubygems_api_key: ${{secrets.RUBYGEMS_AUTH_TOKEN}}\n" > $HOME/.gem/credentials
+#
+#      - name: Get version
+#        run: echo "${GITHUB_REF/refs\/tags\//}" > release.tag
+#      - name: Set version
+#        run: sed -i "s/0.0.0/$(<release.tag)/g" */**/version.rb
+#
+#      - name: Build gem
+#        run: gem build *.gemspec
+#      - name: Push gem
+#        run: gem push *.gem
