@@ -26,7 +26,7 @@ module SettingsReader
           exiting_entry
         else
           new_entry = block.call(address)
-          save(new_entry)
+          save(new_entry) if new_entry
           new_entry
         end
       end

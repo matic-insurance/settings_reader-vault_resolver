@@ -15,8 +15,8 @@ module SettingsReader
       # Expect value in format `vault://mount/path/to/secret?attribute_name`
       def resolve(value, _path)
         address = SettingsReader::VaultResolver::Address.new(value)
-        secret = address.mount == DATABASE_MOUNT ? database_secret(address) : kv_secret(address)
-        secret && secret.data[address.attribute.to_sym]
+        entry = fetch_entry(address)
+        entry&.value_for(address.attribute)
       end
 
       #Resolve KV secret
@@ -30,6 +30,20 @@ module SettingsReader
         raise unless e.message.include?('* unknown role')
 
         nil
+      end
+
+      private
+
+      def fetch_entry(address)
+        cache.fetch(address) do
+          if (secret = address.mount == DATABASE_MOUNT ? database_secret(address) : kv_secret(address))
+            SettingsReader::VaultResolver::Entry.new(address, secret)
+          end
+        end
+      end
+
+      def cache
+        SettingsReader::VaultResolver.cache
       end
     end
   end

@@ -34,6 +34,10 @@ module SettingsReader
         true
       end
 
+      def value_for(attribute)
+        secret.data[attribute.to_sym]
+      end
+
       private
 
       def lease_duration

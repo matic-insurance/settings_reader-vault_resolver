@@ -27,6 +27,14 @@ RSpec.describe SettingsReader::VaultResolver::Resolver, :vault do
         expect(resolver.resolve('vault://secret/test/app_secret#value', path)).to eq('super_secret')
       end
 
+      it 'caching retrieved value' do
+        address = 'vault://secret/test/app_secret#value'
+        set_vault_value('test/app_secret', value: 'super_secret')
+        resolver.resolve(address, path)
+        set_vault_value('test/app_secret', value: 'another_secret')
+        expect(resolver.resolve(address, path)).to eq('super_secret')
+      end
+
       it 'returns preconfigured value' do
         expect(resolver.resolve('vault://secret/preconfigured#foo', path)).to eq('a')
       end
@@ -44,6 +52,11 @@ RSpec.describe SettingsReader::VaultResolver::Resolver, :vault do
       it 'returns user name' do
         value = resolver.resolve('vault://database/creds/app-user#username', path)
         expect(value).to start_with('v-token-app-user-')
+      end
+
+      it 'caching retrieved value' do
+        address = 'vault://database/creds/app-user#username'
+        expect(resolver.resolve(address, path)).to eq(resolver.resolve(address, path))
       end
 
       it 'returns password' do
