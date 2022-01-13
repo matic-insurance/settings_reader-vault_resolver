@@ -60,4 +60,38 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
       end
     end
   end
+
+  describe '.fetch' do
+    context 'when cached' do
+      let(:fetch) { cache.fetch(address) { raise 'eeee' } }
+
+      before { cache.save(entry) }
+
+      it 'does not execute block' do
+        expect { fetch }.to_not raise_error
+      end
+
+      it 'does not removes cache' do
+        fetch
+        expect(cache.retrieve(address)).to eq(entry)
+      end
+
+      it 'returns entry' do
+        expect(fetch).to eq(entry)
+      end
+    end
+
+    context 'when not cached' do
+      let(:fetch) { cache.fetch(address) { entry } }
+
+      it 'returns entry' do
+        expect(fetch).to eq(entry)
+      end
+
+      it 'saves entry to cache' do
+        fetch
+        expect(cache.retrieve(address)).to eq(entry)
+      end
+    end
+  end
 end

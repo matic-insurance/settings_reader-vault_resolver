@@ -22,11 +22,13 @@ module SettingsReader
       end
 
       def fetch(address, &block)
-        return exiting_entry if (exiting_entry = retrieve(address))
-
-        new_entry = block.call(address)
-        save(new_entry)
-        new_entry
+        if (exiting_entry = retrieve(address))
+          exiting_entry
+        else
+          new_entry = block.call(address)
+          save(new_entry)
+          new_entry
+        end
       end
 
       def entries(&block)
