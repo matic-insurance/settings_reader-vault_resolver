@@ -9,11 +9,59 @@ This gem works as a plugin for [Settings Reader](https://github.com/matic-insura
 
 ## Installation
 
-TODO: Write installation instructions
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'settings_reader'
+gem 'settings_reader-vault_resolver'
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+### Initialization
+
+At the load of application when initializing `settings_reader`:
+```ruby
+#Init vault
+Vault.address = 'http://127.0.0.1:8200'
+Vault.token = 'MY_SUPER_SECRET_TOKEN'
+
+#Init Settings Reader
+SettingsReader.configure do |config|
+  config.settings_providers = [
+    SettingsReader::Providers::Yaml,
+  ]
+
+  config.value_resolvers = [
+    SettingsReader::Resolvers::Vault,
+    SettingsReader::Resolvers::Env,
+  ]
+end
+
+#Load Settings
+APP_SETTINGS = SettingsReader.load
+```
+
+### Usage
+If one of the values provided will begin with `vault://` scheme - 
+`VaultResolver` gem will kick in and will try to resolve path in Vault
+
+Assuming your settings has following structure:
+```yaml
+app:
+  name: 'MyCoolApp'
+  hostname: 'http://localhost:3001'
+  secret: 'vault://secret/apps/my_cool_app#app_secret'
+```
+
+When requesting `app/secret` from `SettingsReader` it will resolve in Vault as:
+
+```ruby
+secret = APP_SETTINGS.get('app/secret') 
+# Gem will read `vault://secret/app#secret` from YAML
+# Gem will resolve value in Vault using Vault.kv('secret').read('apps/my_cool_app')
+# Gem will return `app_secret` attribute from the secret resolved above
+```
 
 ## Development
 
