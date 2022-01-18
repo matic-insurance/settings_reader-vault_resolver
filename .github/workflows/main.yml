@@ -11,6 +11,11 @@ on:
 
 jobs:
   build:
+    env:
+      COVERAGE: true
+      VAULT_ADDR: 'http://127.0.0.1:8200'
+      VAULT_TOKEN: 'vault_root_token'
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -51,9 +56,6 @@ jobs:
       - name: Set up Dependencies
         run: bundle install --path vendor/bundle
       - name: Set up Vault
-        env:
-          VAULT_ADDR: 'http://127.0.0.1:8200'
-          VAULT_TOKEN: 'vault_root_token'
         run: sh local/vault/setup.sh
 
       - name: Run specs
