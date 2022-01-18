@@ -1,4 +1,4 @@
-RSpec.describe SettingsReader::VaultResolver::Resolver, :vault do
+RSpec.describe SettingsReader::Resolver::Vault, :vault do
   subject(:resolver) { described_class.new }
   let(:path) { 'app/secret' }
 

@@ -1,10 +1,10 @@
 require 'concurrent/timer_task.rb'
 require "settings_reader/vault_resolver/version"
-require "settings_reader/vault_resolver/resolver"
 require "settings_reader/vault_resolver/address"
 require "settings_reader/vault_resolver/entry"
 require "settings_reader/vault_resolver/cache"
 require "settings_reader/vault_resolver/refresher"
+require "settings_reader/resolvers/vault"
 
 module SettingsReader
   module VaultResolver
@@ -21,6 +21,10 @@ module SettingsReader
     def self.setup_lease_refresher
       self.refresher_timer_task ||= SettingsReader::VaultResolver::Refresher.refresh_task(self.cache)
       self.refresher_timer_task.execute
+    end
+
+    def self.resolver
+      SettingsReader::VaultResolver::Vault
     end
 
     setup_cache

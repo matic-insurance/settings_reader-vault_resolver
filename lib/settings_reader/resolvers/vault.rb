@@ -1,8 +1,8 @@
 require 'vault'
 
 module SettingsReader
-  module VaultResolver
-    class Resolver
+  module Resolver
+    class Vault
       IDENTIFIER = 'vault://'.freeze
       DATABASE_MOUNT = 'database'.freeze
 
@@ -21,12 +21,12 @@ module SettingsReader
 
       #Resolve KV secret
       def kv_secret(address)
-        Vault.kv(address.mount).read(address.path)
+        ::Vault.kv(address.mount).read(address.path)
       end
 
       def database_secret(address)
-        Vault.logical.read(address.full_path)
-      rescue Vault::HTTPClientError => e
+        ::Vault.logical.read(address.full_path)
+      rescue ::Vault::HTTPClientError => e
         raise unless e.message.include?('* unknown role')
 
         nil
