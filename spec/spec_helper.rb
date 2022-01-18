@@ -1,3 +1,4 @@
+require 'simplecov'
 require "bundler/setup"
 require "settings_reader/vault_resolver"
 
