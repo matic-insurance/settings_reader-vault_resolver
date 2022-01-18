@@ -1,5 +1,8 @@
 # SettingsReader::VaultResolver
 
+![Build Status](https://github.com/matic-insurance/settings_reader-vault_resolver/workflows/ci/badge.svg?branch=main)
+[![Test Coverage](https://codecov.io/gh/matic-insurance/settings_reader-vault_resolver/branch/main/graph/badge.svg?token=dGVDB9judr)](https://codecov.io/gh/matic-insurance/settings_reader-vault_resolver)
+
 Settings Reader plugin to resolve values using in Hashicorp Vault
 
 This gem works as a plugin for [Settings Reader](https://github.com/matic-insurance/consul_application_settings)
