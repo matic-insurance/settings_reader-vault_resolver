@@ -61,10 +61,10 @@ jobs:
           COVERAGE: true
         run: bundle exec rspec
 
-#      - name: Upload coverage
-#        env:
-#          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-#        run: bash <(curl -s https://codecov.io/bash)
+      - name: Upload coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: bash <(curl -s https://codecov.io/bash)
 
   release:
     runs-on: ubuntu-latest
