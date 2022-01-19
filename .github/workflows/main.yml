@@ -92,7 +92,7 @@ jobs:
       - name: Get version
         run: echo "${GITHUB_REF/refs\/tags\//}" > release.tag
       - name: Set version
-        run: sed -i "s/0.0.0/$(<release.tag)/g" */**/version.rb
+        run: sed -i "s/0.0.0/$(<release.tag)/g" $(find . -name "version.rb")
 
       - name: Build gem
         run: gem build *.gemspec
