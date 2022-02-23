@@ -4,7 +4,7 @@ require 'settings_reader/vault_resolver/address'
 require 'settings_reader/vault_resolver/entry'
 require 'settings_reader/vault_resolver/cache'
 require 'settings_reader/vault_resolver/refresher'
-require 'settings_reader/resolvers/vault'
+require 'settings_reader/vault_resolver/instance'
 
 module SettingsReader
   # Singleton for lease renewals and secrets cache
@@ -25,7 +25,7 @@ module SettingsReader
     end
 
     def self.resolver
-      SettingsReader::VaultResolver::Vault
+      SettingsReader::VaultResolver::Instance.new
     end
 
     setup_cache
