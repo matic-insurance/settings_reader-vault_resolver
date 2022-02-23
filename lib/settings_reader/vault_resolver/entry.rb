@@ -1,7 +1,9 @@
 module SettingsReader
   module VaultResolver
+    # Wrapper around vault secret object
     class Entry
       attr_reader :address, :secret
+
       MONTH = 30 * 60 * 60
 
       def initialize(address, secret)

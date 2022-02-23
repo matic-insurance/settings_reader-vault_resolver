@@ -1,0 +1,16 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 2.6
+
+Gemspec/RequireMFA:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Metrics/BlockLength:
+  IgnoredMethods: ['describe', 'context']
+
+Layout/LineLength:
+  Max: 120

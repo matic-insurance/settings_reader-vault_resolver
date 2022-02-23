@@ -1,7 +1,9 @@
 require 'vault'
+require 'settings_reader/vault_resolver'
 
 module SettingsReader
   module Resolver
+    # Resolver class for Settings Reader
     class Vault
       IDENTIFIER = 'vault://'.freeze
       DATABASE_MOUNT = 'database'.freeze
@@ -19,7 +21,7 @@ module SettingsReader
         entry&.value_for(address.attribute)
       end
 
-      #Resolve KV secret
+      # Resolve KV secret
       def kv_secret(address)
         ::Vault.kv(address.mount).read(address.path)
       end

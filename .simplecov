@@ -1,4 +1,4 @@
-if ENV["COVERAGE"]
+if ENV['COVERAGE']
   require 'simplecov'
   require 'codecov'
   SimpleCov.start do

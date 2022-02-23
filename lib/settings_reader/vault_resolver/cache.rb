@@ -1,5 +1,6 @@
 module SettingsReader
   module VaultResolver
+    # Secrets cache for seamless dynamic keys and renewal operations
     class Cache
       def initialize
         @secrets = {}

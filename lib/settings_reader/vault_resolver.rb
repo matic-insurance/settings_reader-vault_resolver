@@ -1,12 +1,13 @@
-require 'concurrent/timer_task.rb'
-require "settings_reader/vault_resolver/version"
-require "settings_reader/vault_resolver/address"
-require "settings_reader/vault_resolver/entry"
-require "settings_reader/vault_resolver/cache"
-require "settings_reader/vault_resolver/refresher"
-require "settings_reader/resolvers/vault"
+require 'concurrent/timer_task'
+require 'settings_reader/vault_resolver/version'
+require 'settings_reader/vault_resolver/address'
+require 'settings_reader/vault_resolver/entry'
+require 'settings_reader/vault_resolver/cache'
+require 'settings_reader/vault_resolver/refresher'
+require 'settings_reader/resolvers/vault'
 
 module SettingsReader
+  # Singleton for lease renewals and secrets cache
   module VaultResolver
     class Error < StandardError; end
 
