@@ -1,5 +1,5 @@
 RSpec.describe 'SettingsReader integration', :vault do
-  let(:settings_path) { File.expand_path('../../fixtures/settings.yml', __FILE__)}
+  let(:settings_path) { File.expand_path('../fixtures/settings.yml', __dir__) }
   let(:settings) do
     SettingsReader.load do |config|
       config.backends = [SettingsReader::Backends::YamlFile.new(settings_path)]
