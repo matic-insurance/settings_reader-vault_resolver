@@ -72,9 +72,5 @@ RSpec.describe SettingsReader::VaultResolver::Instance, :vault do
         expect(resolver.resolve('vault://database/creds/app-user#missing', path)).to eq(nil)
       end
     end
-
-    it 'returns nil when env missing' do
-      expect(resolver.resolve('vault://secret/missing#value', path)).to eq(nil)
-    end
   end
 end

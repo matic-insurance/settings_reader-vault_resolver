@@ -1,4 +1,5 @@
 require 'concurrent/timer_task'
+require 'settings_reader'
 require 'settings_reader/vault_resolver/version'
 require 'settings_reader/vault_resolver/address'
 require 'settings_reader/vault_resolver/entry'
