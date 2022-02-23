@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
                         with support of dynamic secrets and lease renewal.'
   spec.homepage      = 'https://github.com/matic-insurance/settings_reader-vault_resolver'
   spec.license       = 'MIT'
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.6.0')
+  spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = spec.homepage
