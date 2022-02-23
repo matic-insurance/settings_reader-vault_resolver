@@ -25,7 +25,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
     context 'when up for renewal' do
       before do
-        allow(entry).to receive(:expires_in).and_return 90
+        allow(entry).to receive(:expires_in).and_return 190
         refresher.refresh
       end
 
@@ -36,7 +36,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
     context 'when not time to renew' do
       before do
-        allow(entry).to receive(:expires_in).and_return 150
+        allow(entry).to receive(:expires_in).and_return 210
         refresher.refresh
       end
 

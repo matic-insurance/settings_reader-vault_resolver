@@ -2,7 +2,7 @@ module SettingsReader
   module VaultResolver
     # Vault Lease refresher task
     class Refresher
-      DEFAULT_RENEW_DELAY = 120
+      DEFAULT_RENEW_DELAY = 200
       REFRESH_INTERVAL = 60
 
       def initialize(cache)
