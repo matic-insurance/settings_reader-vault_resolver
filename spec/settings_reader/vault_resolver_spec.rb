@@ -11,4 +11,8 @@ RSpec.describe SettingsReader::VaultResolver do
     described_class.refresher_timer_task
     expect(described_class.refresher_timer_task).to be_instance_of(Concurrent::TimerTask)
   end
+
+  it 'returns instance of resolver' do
+    expect(described_class.resolver).to be_instance_of(SettingsReader::VaultResolver::Instance)
+  end
 end
