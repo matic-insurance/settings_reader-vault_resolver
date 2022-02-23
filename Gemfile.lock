@@ -21,7 +21,6 @@ GEM
     parser (3.1.0.0)
       ast (~> 2.4.1)
     rainbow (3.0.0)
-    rake (13.0.6)
     regexp_parser (2.2.0)
     rexml (3.2.5)
     rspec (3.10.0)
@@ -66,15 +65,13 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 2.0)
-  codecov (~> 0.4)
-  rake (~> 13.0)
-  rspec (~> 3.0)
-  rubocop (~> 0.66)
-  rubocop-rspec (~> 1.32.0)
+  codecov
+  rspec
+  rubocop
+  rubocop-rspec
   settings_reader-vault_resolver!
-  simplecov (~> 0.16)
-  timecop (~> 0.9)
+  simplecov
+  timecop
 
 BUNDLED WITH
    2.1.4

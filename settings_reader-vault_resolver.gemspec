@@ -29,13 +29,4 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'concurrent-ruby', '~> 1.1'
   spec.add_dependency 'vault', '~> 0.16'
-
-  spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'codecov', '~> 0.4'
-  spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'rubocop', '~> 0.66'
-  spec.add_development_dependency 'rubocop-rspec', '~> 1.32.0'
-  spec.add_development_dependency 'simplecov', '~> 0.16'
-  spec.add_development_dependency 'timecop', '~> 0.9'
 end
