@@ -1,5 +1,6 @@
 module SettingsReader
   module VaultResolver
+    # Parsing of vault address
     class Address
       def initialize(uri)
         @uri = URI.parse(uri)
@@ -22,7 +23,7 @@ module SettingsReader
       end
 
       def options
-        URI::decode_www_form(@uri.query || '').to_h
+        URI.decode_www_form(@uri.query || '').to_h
       end
 
       def to_s

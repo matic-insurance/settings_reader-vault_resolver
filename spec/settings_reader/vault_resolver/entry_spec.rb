@@ -69,7 +69,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
         allow(secret).to receive(:lease_id).and_return(nil)
       end
 
-      it { is_expected.to eq(108000) }
+      it { is_expected.to eq(108_000) }
     end
 
     context 'when secret is leased' do
