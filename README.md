@@ -26,20 +26,13 @@ At the load of application when initializing `settings_reader`:
 Vault.address = 'http://127.0.0.1:8200'
 Vault.token = 'MY_SUPER_SECRET_TOKEN'
 
-#Init Settings Reader
-SettingsReader.configure do |config|
-  config.settings_providers = [
-    SettingsReader::Providers::Yaml,
-  ]
-
-  config.value_resolvers = [
-    SettingsReader::Resolvers::Vault,
-    SettingsReader::Resolvers::Env,
-  ]
+#Load Settings Reader and configure resolver
+AppSettings = SettingsReader.load do |config|
+  # ... Other configurations
+  
+  # Add vault resolver as one of resolvers
+  config.resolvers << SettingsReader::VaultResolver.resolver
 end
-
-#Load Settings
-APP_SETTINGS = SettingsReader.load
 ```
 
 ### Usage
@@ -51,16 +44,22 @@ Assuming your settings has following structure:
 app:
   name: 'MyCoolApp'
   hostname: 'http://localhost:3001'
-  secret: 'vault://secret/apps/my_cool_app#app_secret'
+  static_secret: 'vault://secret/apps/my_cool_app#app_secret'
+  dynamic_secret: 'vault://database/creds/app-db#username'
 ```
 
 When requesting `app/secret` from `SettingsReader` it will resolve in Vault as:
 
 ```ruby
-secret = APP_SETTINGS.get('app/secret') 
+secret = AppSettings.get('app/static_secret') 
 # Gem will read `vault://secret/app#secret` from YAML
 # Gem will resolve value in Vault using Vault.kv('secret').read('apps/my_cool_app')
 # Gem will return `app_secret` attribute from the secret resolved above
+
+db_user = AppSettings.get('app/dynamic_secret')
+# Gem will request dynamic credentials from `vault://database/creds/app-db` and cache them
+# Gem will renew lease on retrieved credentials 3 minutes prior lease expiration from vault
+# Gem will return `username` attribute from dynamic secret
 ```
 
 ## Development
