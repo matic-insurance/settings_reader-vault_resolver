@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'settings_reader-vault_resolver'
   spec.version       = SettingsReader::VaultResolver::VERSION
   spec.authors       = ['Volodymyr Mykhailyk']
-  spec.email         = ['712680+volodymyr-mykhailyk@users.noreply.github.com']
+  spec.email         = ['volodymyr.mykhailyk@gmail.com']
 
   spec.summary       = 'Settings Reader plugin to resolve values using in Hashicorp Vault'
   spec.description   = 'This gem works as a resolver for `settings_reader` gem. \
@@ -28,5 +28,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'concurrent-ruby', '~> 1.1'
+  spec.add_dependency 'settings_reader', '~> 0.1'
   spec.add_dependency 'vault', '~> 0.16'
 end
