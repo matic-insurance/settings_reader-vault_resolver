@@ -38,5 +38,11 @@ RSpec.describe 'SettingsReader integration', :vault do
         expect(settings.get('resources/dynamic_secret/pass')).to eq(settings.get('resources/dynamic_secret/pass'))
       end
     end
+
+    context 'when dont have access to secret' do
+      it 'raising exception' do
+        expect { settings.get('resources/inacessible_secret/foo') }.to raise_error(SettingsReader::VaultResolver::Error)
+      end
+    end
   end
 end

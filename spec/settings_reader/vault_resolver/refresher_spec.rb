@@ -44,5 +44,16 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
         expect(entry).to_not have_received(:renew)
       end
     end
+
+    context 'when error is raised' do
+      before do
+        allow(entry).to receive(:expires_in).and_return 190
+        allow(entry).to receive(:renew).and_raise(SettingsReader::VaultResolver::Error, 'permission denied')
+      end
+
+      it 'handles error' do
+        expect { refresher.refresh }.not_to raise_error
+      end
+    end
   end
 end

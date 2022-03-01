@@ -9,3 +9,5 @@ resources:
   dynamic_secret:
     user: 'vault://database/creds/app-user#username'
     pass: 'vault://database/creds/app-user#password'
+  inacessible_secret:
+    foo: 'vault://secret/unreachable/secret#foo'

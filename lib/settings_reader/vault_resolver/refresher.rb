@@ -15,6 +15,9 @@ module SettingsReader
           next unless entry.expires_in < DEFAULT_RENEW_DELAY
 
           entry.renew
+        rescue SettingsReader::VaultResolver::Error => _e
+          # TODO: Log error in future. Think if we can request new secret again.
+          # Continue renewal.
         end
       end
 
