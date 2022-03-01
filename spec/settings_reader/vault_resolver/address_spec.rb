@@ -7,7 +7,7 @@ RSpec.describe SettingsReader::VaultResolver::Address do
     end
 
     it 'has correct path' do
-      expect(address.path).to eq('/key')
+      expect(address.path).to eq('key')
     end
 
     it 'has correct full path' do
@@ -31,7 +31,7 @@ RSpec.describe SettingsReader::VaultResolver::Address do
     end
 
     it 'has correct path' do
-      expect(address.path).to eq('/path/to/role')
+      expect(address.path).to eq('path/to/role')
     end
 
     it 'has correct full path' do
