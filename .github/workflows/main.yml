@@ -13,6 +13,7 @@ jobs:
   build:
     env:
       COVERAGE: true
+      CODECOV_TOKEN: a0c859b6-dfb7-4d9f-9933-2dd945cdd960
       VAULT_ADDR: 'http://127.0.0.1:8200'
       VAULT_TOKEN: 'vault_root_token'
 
