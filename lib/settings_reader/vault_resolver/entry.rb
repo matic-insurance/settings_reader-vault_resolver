@@ -34,6 +34,8 @@ module SettingsReader
         @secret = Vault.sys.renew(@secret.lease_id)
         @lease_started = Time.now
         true
+      rescue Vault::HTTPClientError => e
+        raise SettingsReader::VaultResolver::Error, e.message
       end
 
       def value_for(attribute)

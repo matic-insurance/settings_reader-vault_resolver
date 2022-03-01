@@ -46,6 +46,11 @@ RSpec.describe SettingsReader::VaultResolver::Instance, :vault do
       it 'returns nil for missing attribute' do
         expect(resolver.resolve('vault://secret/test/app_secret#missing', path)).to eq(nil)
       end
+
+      it 'raising error for permission problems' do
+        error = SettingsReader::VaultResolver::Error
+        expect { resolver.resolve('vault://secret/unreachable/secret#missing', path) }.to raise_error(error)
+      end
     end
 
     context 'dynamic db secret' do
@@ -70,6 +75,11 @@ RSpec.describe SettingsReader::VaultResolver::Instance, :vault do
 
       it 'returns nil for missing attribute' do
         expect(resolver.resolve('vault://database/creds/app-user#missing', path)).to eq(nil)
+      end
+
+      it 'raising error for permission problems' do
+        error = SettingsReader::VaultResolver::Error
+        expect { resolver.resolve('vault://database/creds/unreachable#username', path) }.to raise_error(error)
       end
     end
   end

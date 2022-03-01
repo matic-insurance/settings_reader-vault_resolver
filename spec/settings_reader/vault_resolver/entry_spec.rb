@@ -138,8 +138,22 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
     let(:address) { 'vault://database/creds/app-user#username' }
     let(:secret) { Vault.logical.read('database/creds/app-user') }
 
-    it 'updates secret' do
-      expect { entry.renew }.to change(entry, :secret)
+    context 'when have access' do
+      let(:secret) { Vault.logical.read('database/creds/app-user') }
+
+      it 'updates secret' do
+        expect { entry.renew }.to change(entry, :secret)
+      end
+    end
+
+    context 'when dont have access' do
+      before do
+        allow(secret).to receive(:lease_id).and_return('database/creds/unreachable-user/12345678')
+      end
+
+      it 'error is raised' do
+        expect { entry.renew }.to raise_error(SettingsReader::VaultResolver::Error)
+      end
     end
   end
 end

@@ -23,14 +23,16 @@ module SettingsReader
       # Resolve KV secret
       def kv_secret(address)
         Vault.kv(address.mount).read(address.path)
+      rescue Vault::HTTPClientError => e
+        raise SettingsReader::VaultResolver::Error, e.message
       end
 
       def database_secret(address)
         Vault.logical.read(address.full_path)
       rescue Vault::HTTPClientError => e
-        raise unless e.message.include?('* unknown role')
+        return nil if e.message.include?('* unknown role')
 
-        nil
+        raise SettingsReader::VaultResolver::Error, e.message
       end
 
       private
