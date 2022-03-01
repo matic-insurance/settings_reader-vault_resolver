@@ -11,11 +11,11 @@ module SettingsReader
       end
 
       def path
-        @uri.path
+        @uri.path.delete_prefix('/')
       end
 
       def full_path
-        "#{mount}#{path}"
+        "#{mount}#{@uri.path}"
       end
 
       def attribute
