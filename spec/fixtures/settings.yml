@@ -5,7 +5,7 @@ resources:
   static_secret:
     existing: 'vault://secret/pre-configured#foo'
     missing_attribute: 'vault://secret/pre-configured#zzz'
-    unknown_secret: 'vault://secret/unknown#test'
+    unknown_secret: 'vault://secret/deep/unknown#test'
   dynamic_secret:
     user: 'vault://database/creds/app-user#username'
     pass: 'vault://database/creds/app-user#password'

@@ -40,7 +40,7 @@ RSpec.describe SettingsReader::VaultResolver::Instance, :vault do
       end
 
       it 'returns nil for missing path' do
-        expect(resolver.resolve('vault://secret/unknown#test', path)).to eq(nil)
+        expect(resolver.resolve('vault://secret/test/unknown#test', path)).to eq(nil)
       end
 
       it 'returns nil for missing attribute' do
