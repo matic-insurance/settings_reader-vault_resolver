@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.2.1]
+### Fixes
+- Use default k8s auth route without namespace 
+
 ## [0.2.0]
 ### New features
 - Better integration with parent gem
@@ -17,7 +21,8 @@
 - Secrets caching
 - Automatic secrets lease renewal
 
-[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.1
 [0.2.0]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.0
 [0.1.1]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.1.1
 [0.1.0]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.1.0
