@@ -31,10 +31,12 @@ module SettingsReader
     end
 
     def self.setup_cache
+      logger.debug { '[VaultResolver] Setting up secrets cache' }
       self.cache ||= SettingsReader::VaultResolver::Cache.new
     end
 
     def self.setup_lease_refresher
+      logger.debug { '[VaultResolver] Setting up lease resolver task' }
       self.refresher_timer_task ||= SettingsReader::VaultResolver::Refresher.refresh_task(self.cache)
       self.refresher_timer_task.execute
     end
