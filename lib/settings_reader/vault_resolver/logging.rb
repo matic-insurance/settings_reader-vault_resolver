@@ -33,7 +33,7 @@ module SettingsReader
       private
 
       def logger
-        @logger ||= SettingsReader::VaultResolver.logger
+        SettingsReader::VaultResolver.logger
       end
     end
   end
