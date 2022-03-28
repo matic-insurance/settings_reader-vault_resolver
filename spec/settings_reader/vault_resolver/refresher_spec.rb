@@ -10,6 +10,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
   context 'with static secrets' do
     before do
       allow(entry).to receive(:leased?).and_return false
+      allow(entry).to receive(:expires_in).and_return 1000
       refresher.refresh
     end
 
