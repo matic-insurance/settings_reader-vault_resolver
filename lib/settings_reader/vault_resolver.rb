@@ -21,9 +21,13 @@ module SettingsReader
 
     def self.logger
       return @logger if @logger
-      return @logger = Rails.logger if defined? Rails
+      return @logger = Rails.logger if (defined? Rails) && Rails.logger
 
       @logger = Logger.new($stdout, level: Logger::INFO)
+    end
+
+    def self.logger=(logger)
+      @logger = logger
     end
 
     def self.setup_cache
