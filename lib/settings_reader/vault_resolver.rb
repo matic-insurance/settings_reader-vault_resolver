@@ -1,6 +1,9 @@
+require 'logger'
 require 'concurrent/timer_task'
+
 require 'settings_reader'
 require 'settings_reader/vault_resolver/version'
+require 'settings_reader/vault_resolver/logging'
 require 'settings_reader/vault_resolver/address'
 require 'settings_reader/vault_resolver/entry'
 require 'settings_reader/vault_resolver/cache'
@@ -14,6 +17,13 @@ module SettingsReader
 
     class << self
       attr_accessor :cache, :refresher_timer_task
+    end
+
+    def self.logger
+      return @logger if @logger
+      return @logger = Rails.logger if defined? Rails
+
+      @logger = Logger.new($stdout, level: Logger::INFO)
     end
 
     def self.setup_cache

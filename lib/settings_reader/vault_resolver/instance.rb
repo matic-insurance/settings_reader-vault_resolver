@@ -4,6 +4,8 @@ module SettingsReader
   module VaultResolver
     # Resolver class for Settings Reader
     class Instance
+      include Logging
+
       IDENTIFIER = 'vault://'.freeze
       DATABASE_MOUNT = 'database'.freeze
 
@@ -15,6 +17,7 @@ module SettingsReader
 
       # Expect value in format `vault://mount/path/to/secret?attribute_name`
       def resolve(value, _path)
+        debug { "Resolving Vault secret at #{value}" }
         address = SettingsReader::VaultResolver::Address.new(value)
         entry = fetch_entry(address)
         entry&.value_for(address.attribute)
@@ -22,14 +25,18 @@ module SettingsReader
 
       # Resolve KV secret
       def kv_secret(address)
+        debug { "Fetching new kv secret at: #{address}" }
         Vault.kv(address.mount).read(address.path)
       rescue Vault::HTTPClientError => e
+        error { "Error retrieving secret at: #{address}: #{e.message}" }
         raise SettingsReader::VaultResolver::Error, e.message
       end
 
       def database_secret(address)
+        debug { "Fetching new database secret at: #{address}" }
         Vault.logical.read(address.full_path)
       rescue Vault::HTTPClientError => e
+        error { "Error retrieving database secret: #{address}: #{e.message}" }
         return nil if e.message.include?('* unknown role')
 
         raise SettingsReader::VaultResolver::Error, e.message
@@ -39,8 +46,12 @@ module SettingsReader
 
       def fetch_entry(address)
         cache.fetch(address) do
+          info { "Retrieving new secret at: #{address}" }
           if (secret = address.mount == DATABASE_MOUNT ? database_secret(address) : kv_secret(address))
+            debug { "Retrieved secret at: #{address}" }
             SettingsReader::VaultResolver::Entry.new(address, secret)
+          else
+            debug { "Secret not retrieved: #{address}" }
           end
         end
       end

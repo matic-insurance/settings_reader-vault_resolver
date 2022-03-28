@@ -42,6 +42,10 @@ module SettingsReader
         secret.data[attribute.to_sym]
       end
 
+      def to_s
+        address.to_s
+      end
+
       private
 
       def lease_duration
