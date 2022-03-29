@@ -11,11 +11,15 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
     before do
       allow(entry).to receive(:leased?).and_return false
       allow(entry).to receive(:expires_in).and_return 1000
-      refresher.refresh
     end
 
     it 'does not renew entry' do
+      refresher.refresh
       expect(entry).to_not have_received(:renew)
+    end
+
+    it 'returns empty list of refreshed promises' do
+      expect(refresher.refresh).to eq([])
     end
   end
 
@@ -33,6 +37,10 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
       it 'renews entry' do
         expect(entry).to have_received(:renew)
       end
+
+      it 'returns list of refreshed promises' do
+        expect(refresher.refresh.map(&:fulfilled?)).to eq([true])
+      end
     end
 
     context 'when not time to renew' do
@@ -44,6 +52,10 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
       it 'renews entry' do
         expect(entry).to_not have_received(:renew)
       end
+
+      it 'returns empty list of refreshed promises' do
+        expect(refresher.refresh).to eq([])
+      end
     end
 
     context 'when error is raised' do
@@ -54,6 +66,10 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
       it 'handles error' do
         expect { refresher.refresh }.not_to raise_error
+      end
+
+      it 'returns list of rejected promises' do
+        expect(refresher.refresh.map(&:fulfilled?)).to eq([false])
       end
     end
   end
