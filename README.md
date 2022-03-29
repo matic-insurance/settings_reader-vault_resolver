@@ -28,7 +28,13 @@ Vault.token = 'MY_SUPER_SECRET_TOKEN'
 
 #Load Settings Reader and configure resolver
 AppSettings = SettingsReader.load do |config|
-  # ... Other configurations
+  # ... SettingReader configurations
+  
+  # Configure vault resolver
+  SettingsReader::VaultResolver.configure do |vault_resolver_config|
+    vault_resolver_config.logger = Rails.logger
+    # ... VaultResolver configurations
+  end
   
   # Add vault resolver as one of resolvers
   config.resolvers << SettingsReader::VaultResolver.resolver
