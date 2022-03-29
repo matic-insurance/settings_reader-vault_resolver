@@ -38,8 +38,12 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
         expect(entry).to have_received(:renew)
       end
 
-      it 'returns list of refreshed promises' do
+      it 'returns list of fulfilled promises' do
         expect(refresher.refresh.map(&:fulfilled?)).to eq([true])
+      end
+
+      it 'returns list of entries' do
+        expect(refresher.refresh.map(&:value)).to eq([entry])
       end
     end
 
@@ -70,6 +74,10 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
       it 'returns list of rejected promises' do
         expect(refresher.refresh.map(&:fulfilled?)).to eq([false])
+      end
+
+      it 'returns list of errors' do
+        expect(refresher.refresh.map(&:reason)).to match([instance_of(SettingsReader::VaultResolver::Error)])
       end
     end
   end
