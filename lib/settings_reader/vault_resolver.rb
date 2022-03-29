@@ -9,6 +9,7 @@ require 'settings_reader/vault_resolver/address'
 require 'settings_reader/vault_resolver/entry'
 require 'settings_reader/vault_resolver/cache'
 require 'settings_reader/vault_resolver/refresher'
+require 'settings_reader/vault_resolver/refresher_observer'
 require 'settings_reader/vault_resolver/instance'
 
 module SettingsReader

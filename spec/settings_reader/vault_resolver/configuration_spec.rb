@@ -2,7 +2,7 @@ RSpec.describe SettingsReader::VaultResolver::Configuration do
   let(:config) { described_class.new }
 
   describe '#setup_lease_refresher' do
-    let(:task) { instance_double(Concurrent::TimerTask, execute: true) }
+    let(:task) { instance_double(Concurrent::TimerTask, execute: true, add_observer: true) }
 
     before { allow(Concurrent::TimerTask).to receive(:new).and_return(task) }
 
@@ -19,6 +19,11 @@ RSpec.describe SettingsReader::VaultResolver::Configuration do
       it 'starts task' do
         config.setup_lease_refresher
         expect(task).to have_received(:execute)
+      end
+
+      it 'adds observer' do
+        config.setup_lease_refresher
+        expect(task).to have_received(:add_observer).with(instance_of(SettingsReader::VaultResolver::RefresherObserver))
       end
     end
 
@@ -37,6 +42,11 @@ RSpec.describe SettingsReader::VaultResolver::Configuration do
       it 'starts task' do
         config.setup_lease_refresher(previous_task)
         expect(task).to have_received(:execute)
+      end
+
+      it 'adds observer' do
+        config.setup_lease_refresher
+        expect(task).to have_received(:add_observer).with(instance_of(SettingsReader::VaultResolver::RefresherObserver))
       end
 
       it 'shuts down old task' do

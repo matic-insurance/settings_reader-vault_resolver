@@ -10,9 +10,19 @@ module SettingsReader
       # Default: 300seconds
       attr_accessor :lease_renew_delay
 
+      # Block to be executed when lease is not refreshed
+      # Default: empty proc
+      attr_accessor :lease_renew_error_listener
+
+      # Block to be executed when lease is refreshed
+      # Default: empty proc
+      attr_accessor :lease_renew_success_listener
+
       def initialize
         @lease_refresh_interval = 60
         @lease_renew_delay = 300
+        @lease_renew_error_listener = proc {}
+        @lease_renew_success_listener = proc {}
       end
 
       def setup_lease_refresher(previous_task = nil)
@@ -21,6 +31,7 @@ module SettingsReader
         timer_task = Concurrent::TimerTask.new(execution_interval: lease_refresh_interval) do
           SettingsReader::VaultResolver::Refresher.new(cache).refresh
         end
+        timer_task.add_observer(SettingsReader::VaultResolver::RefresherObserver.new(self))
         timer_task.execute
         timer_task
       end
