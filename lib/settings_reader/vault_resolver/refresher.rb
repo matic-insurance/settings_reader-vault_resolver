@@ -9,13 +9,16 @@ module SettingsReader
       DEFAULT_RENEW_DELAY = 200
       REFRESH_INTERVAL = 60
 
-      def initialize(cache)
+      attr_reader :cache, :config
+
+      def initialize(cache, config)
         @cache = cache
+        @config = config
       end
 
       def refresh
         info { 'Performing Vault leases refresh' }
-        promises = @cache.entries.map do |entry|
+        promises = cache.entries.map do |entry|
           debug { "Checking lease for #{entry}. Leased?: #{entry.leased?}. Expires in: #{entry.expires_in}s" }
           refresh_entry(entry)
         end.compact
@@ -25,7 +28,7 @@ module SettingsReader
 
       def refresh_entry(entry)
         return unless entry.leased?
-        return unless entry.expires_in < DEFAULT_RENEW_DELAY
+        return unless entry.expires_in < config.lease_renew_delay
 
         Concurrent::Promise.execute do
           debug { "Refreshing lease for #{entry}. Expires in: #{entry.expires_in}" }
