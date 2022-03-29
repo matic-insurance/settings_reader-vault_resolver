@@ -3,34 +3,31 @@ module SettingsReader
     # Methods for centralized logging
     module Logging
       def debug(&block)
-        logger.debug do
-          "[VaultResolver] #{block.call}"
-        end
-        nil
+        log_message(Logger::DEBUG, &block)
       end
 
       def info(&block)
-        logger.info do
-          "[VaultResolver] #{block.call}"
-        end
-        nil
+        log_message(Logger::INFO, &block)
       end
 
       def warn(&block)
-        logger.warn do
-          "[VaultResolver] #{block.call}"
-        end
-        nil
+        log_message(Logger::WARN, &block)
       end
 
       def error(&block)
-        logger.error do
-          "[VaultResolver] #{block.call}"
-        end
-        nil
+        log_message(Logger::ERROR, &block)
       end
 
       private
+
+      def log_message(severity, &block)
+        logger.log(severity) do
+          "[VaultResolver] #{block.call}"
+        rescue StandardError => _e
+          # Ignoring errors in log message
+        end
+        nil
+      end
 
       def logger
         SettingsReader::VaultResolver.logger
