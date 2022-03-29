@@ -1,7 +1,13 @@
 ## [Unreleased]
+
+## [0.3.0]
+### Breaking changes
+- Require configuration before use
+
 ### New features
 - Gem configurations
 - Require configuration before use
+- Report renew errors via configuration listeners
 
 ### Fixes
 - Cleanup logging
@@ -39,7 +45,8 @@
 - Secrets caching
 - Automatic secrets lease renewal
 
-[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.2.4...HEAD
+[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.3.0...HEAD
+[0.2.4]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.3.0
 [0.2.4]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.4
 [0.2.3]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.3
 [0.2.2]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.2
