@@ -16,7 +16,7 @@ module SettingsReader
     class Error < StandardError; end
 
     class << self
-      attr_accessor :cache, :refresher_timer_task
+      attr_accessor :refresher_timer_task
     end
 
     def self.logger
@@ -30,22 +30,24 @@ module SettingsReader
       @logger = logger
     end
 
-    def self.setup_cache
-      logger.debug { '[VaultResolver] Setting up secrets cache' }
-      self.cache ||= SettingsReader::VaultResolver::Cache.new
-    end
-
-    def self.setup_lease_refresher
-      logger.debug { '[VaultResolver] Setting up lease resolver task' }
-      self.refresher_timer_task ||= SettingsReader::VaultResolver::Refresher.refresh_task(self.cache)
-      self.refresher_timer_task.execute
+    def self.cache
+      @cache ||= SettingsReader::VaultResolver::Cache.new
     end
 
     def self.resolver
       SettingsReader::VaultResolver::Instance.new
     end
 
-    setup_cache
+    def self.setup_lease_refresher
+      return @refresher_timer_task if @refresher_timer_task
+
+      refresher = SettingsReader::VaultResolver::Refresher
+      @refresher_timer_task = Concurrent::TimerTask.new(execution_interval: refresher::REFRESH_INTERVAL) do
+        SettingsReader::VaultResolver::Refresher.new(cache).refresh
+      end
+      @refresher_timer_task.execute
+    end
+
     setup_lease_refresher
   end
 end
