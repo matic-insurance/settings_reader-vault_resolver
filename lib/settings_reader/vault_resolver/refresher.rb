@@ -31,6 +31,7 @@ module SettingsReader
           debug { "Refreshing lease for #{entry}. Expires in: #{entry.expires_in}" }
           entry.renew
           info { "Lease renewed for #{entry}. Expires in: #{entry.expires_in}" }
+          entry
         rescue StandardError => e
           error { "Error refreshing lease for #{entry}: #{e.message}" }
           raise SettingsReader::VaultResolver::Error, e.message
