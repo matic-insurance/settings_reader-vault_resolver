@@ -1,4 +1,8 @@
 ## [Unreleased]
+### New features
+- Gem configurations
+- Require configuration before use
+
 ### Fixes
 - Cleanup logging
 

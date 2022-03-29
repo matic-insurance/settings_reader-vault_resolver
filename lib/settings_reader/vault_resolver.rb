@@ -4,6 +4,7 @@ require 'concurrent/timer_task'
 require 'settings_reader'
 require 'settings_reader/vault_resolver/version'
 require 'settings_reader/vault_resolver/logging'
+require 'settings_reader/vault_resolver/configuration'
 require 'settings_reader/vault_resolver/address'
 require 'settings_reader/vault_resolver/entry'
 require 'settings_reader/vault_resolver/cache'
@@ -16,7 +17,13 @@ module SettingsReader
     class Error < StandardError; end
 
     class << self
-      attr_accessor :refresher_timer_task
+      attr_reader :configuration, :refresher_timer_task
+    end
+
+    def self.configure(&block)
+      @configuration = SettingsReader::VaultResolver::Configuration.new
+      block&.call(@configuration)
+      @refresher_timer_task = @configuration.setup_lease_refresher(@refresher_timer_task)
     end
 
     def self.logger
@@ -35,19 +42,9 @@ module SettingsReader
     end
 
     def self.resolver
+      raise Error, 'Gem not configured. Call configure before getting resolver' unless configuration
+
       SettingsReader::VaultResolver::Instance.new
     end
-
-    def self.setup_lease_refresher
-      return @refresher_timer_task if @refresher_timer_task
-
-      refresher = SettingsReader::VaultResolver::Refresher
-      @refresher_timer_task = Concurrent::TimerTask.new(execution_interval: refresher::REFRESH_INTERVAL) do
-        SettingsReader::VaultResolver::Refresher.new(cache).refresh
-      end
-      @refresher_timer_task.execute
-    end
-
-    setup_lease_refresher
   end
 end

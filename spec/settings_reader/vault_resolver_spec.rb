@@ -13,17 +13,36 @@ RSpec.describe SettingsReader::VaultResolver do
     end
   end
 
+  describe '.configure' do
+    it 'yields configuration' do
+      config = instance_of(SettingsReader::VaultResolver::Configuration)
+      expect { |b| described_class.configure(&b) }.to yield_with_args(config)
+    end
+  end
+
   describe '.refresher_timer_task' do
     it 'has configured lease refresher' do
       expect(described_class.refresher_timer_task).to be_instance_of(Concurrent::TimerTask)
     end
 
-    it 'does not change task on second setup' do
-      expect { described_class.setup_lease_refresher }.not_to change(described_class, :refresher_timer_task)
+    it 'changes task on every configuration' do
+      expect { described_class.configure }.to change(described_class, :refresher_timer_task)
     end
   end
 
-  it 'returns instance of resolver' do
-    expect(described_class.resolver).to be_instance_of(SettingsReader::VaultResolver::Instance)
+  describe '.resolver' do
+    context 'when configured' do
+      it 'returns instance of resolver' do
+        expect(described_class.resolver).to be_instance_of(SettingsReader::VaultResolver::Instance)
+      end
+    end
+
+    context 'when not configured' do
+      before { described_class.instance_variable_set(:@configuration, nil) }
+
+      it 'raising error' do
+        expect { described_class.resolver }.to raise_error(SettingsReader::VaultResolver::Error)
+      end
+    end
   end
 end
