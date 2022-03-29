@@ -9,7 +9,6 @@ RSpec.describe 'SettingsReader integration', :vault do
 
   context 'when reading yml settings' do
     it 'returns value' do
-      puts settings_path
       expect(settings.get('app/name')).to eq('SettingsReader::VaultResolver')
     end
   end

@@ -27,17 +27,6 @@ module SettingsReader
       @refresher_timer_task = @configuration.setup_lease_refresher(cache, refresher_timer_task)
     end
 
-    def self.logger
-      return @logger if @logger
-      return @logger = Rails.logger if (defined? Rails) && Rails.logger
-
-      @logger = Logger.new($stdout, level: Logger::INFO)
-    end
-
-    def self.logger=(logger)
-      @logger = logger
-    end
-
     def self.cache
       @cache ||= SettingsReader::VaultResolver::Cache.new
     end
@@ -45,7 +34,7 @@ module SettingsReader
     def self.resolver
       raise Error, 'Gem not configured. Call configure before getting resolver' unless configuration
 
-      SettingsReader::VaultResolver::Instance.new(configure)
+      SettingsReader::VaultResolver::Instance.new(configuration)
     end
   end
 end
