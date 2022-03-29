@@ -25,11 +25,11 @@ module SettingsReader
         @lease_renew_success_listener = proc {}
       end
 
-      def setup_lease_refresher(previous_task = nil)
+      def setup_lease_refresher(cache, previous_task = nil)
         previous_task&.shutdown
 
         timer_task = Concurrent::TimerTask.new(execution_interval: lease_refresh_interval) do
-          SettingsReader::VaultResolver::Refresher.new(cache).refresh
+          SettingsReader::VaultResolver::Refresher.new(cache, self).refresh
         end
         timer_task.add_observer(SettingsReader::VaultResolver::RefresherObserver.new(self))
         timer_task.execute

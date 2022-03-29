@@ -24,7 +24,7 @@ module SettingsReader
     def self.configure(&block)
       @configuration = SettingsReader::VaultResolver::Configuration.new
       block&.call(@configuration)
-      @refresher_timer_task = @configuration.setup_lease_refresher(@refresher_timer_task)
+      @refresher_timer_task = @configuration.setup_lease_refresher(cache, refresher_timer_task)
     end
 
     def self.logger
