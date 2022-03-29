@@ -28,7 +28,6 @@ module SettingsReader
         debug { "Fetching new kv secret at: #{address}" }
         Vault.kv(address.mount).read(address.path)
       rescue Vault::HTTPClientError => e
-        error { "Error retrieving secret at: #{address}: #{e.message}" }
         raise SettingsReader::VaultResolver::Error, e.message
       end
 
@@ -36,7 +35,6 @@ module SettingsReader
         debug { "Fetching new database secret at: #{address}" }
         Vault.logical.read(address.full_path)
       rescue Vault::HTTPClientError => e
-        error { "Error retrieving database secret: #{address}: #{e.message}" }
         return nil if e.message.include?('* unknown role')
 
         raise SettingsReader::VaultResolver::Error, e.message
@@ -50,10 +48,11 @@ module SettingsReader
           if (secret = address.mount == DATABASE_MOUNT ? database_secret(address) : kv_secret(address))
             debug { "Retrieved secret at: #{address}" }
             SettingsReader::VaultResolver::Entry.new(address, secret)
-          else
-            debug { "Secret not retrieved: #{address}" }
           end
         end
+      rescue StandardError => e
+        error { "Error retrieving secret: #{address}: #{e.message}" }
+        raise e
       end
 
       def cache
