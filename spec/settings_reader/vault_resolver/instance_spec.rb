@@ -1,6 +1,7 @@
 RSpec.describe SettingsReader::VaultResolver::Instance, :vault do
-  subject(:resolver) { described_class.new }
+  subject(:resolver) { described_class.new(config) }
   let(:path) { 'app/secret' }
+  let(:config) { SettingsReader::VaultResolver::Configuration.new }
 
   describe '#resolvable?' do
     it 'returns true when starts with vault://' do

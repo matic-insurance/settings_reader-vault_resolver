@@ -44,7 +44,7 @@ module SettingsReader
     def self.resolver
       raise Error, 'Gem not configured. Call configure before getting resolver' unless configuration
 
-      SettingsReader::VaultResolver::Instance.new
+      SettingsReader::VaultResolver::Instance.new(configure)
     end
   end
 end

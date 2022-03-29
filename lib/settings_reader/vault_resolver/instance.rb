@@ -9,6 +9,12 @@ module SettingsReader
       IDENTIFIER = 'vault://'.freeze
       DATABASE_MOUNT = 'database'.freeze
 
+      attr_reader :config
+
+      def initialize(config)
+        @config = config
+      end
+
       def resolvable?(value, _path)
         return unless value.respond_to?(:start_with?)
 
