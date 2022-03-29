@@ -2,6 +2,10 @@ module SettingsReader
   module VaultResolver
     # Configurations for vault resolver
     class Configuration
+      # Logger for gem
+      # Default: Logger.new(STDOUT, level: Logger::ERROR)
+      attr_accessor :logger
+
       # How often do we check if secret lease is about to expire
       # Default: 60seconds
       attr_accessor :lease_refresh_interval
@@ -10,15 +14,16 @@ module SettingsReader
       # Default: 300seconds
       attr_accessor :lease_renew_delay
 
-      # Block to be executed when lease is not refreshed
-      # Default: empty proc
-      attr_accessor :lease_renew_error_listener
-
       # Block to be executed when lease is refreshed
       # Default: empty proc
       attr_accessor :lease_renew_success_listener
 
+      # Block to be executed when lease is not refreshed
+      # Default: empty proc
+      attr_accessor :lease_renew_error_listener
+
       def initialize
+        @logger = Logger.new($stdout, level: Logger::ERROR)
         @lease_refresh_interval = 60
         @lease_renew_delay = 300
         @lease_renew_error_listener = proc {}

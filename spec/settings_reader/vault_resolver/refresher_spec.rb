@@ -1,13 +1,12 @@
 RSpec.describe SettingsReader::VaultResolver::Refresher do
-  subject(:refresher) { described_class.new(cache, config) }
+  subject(:refresher) { described_class.new(cache, SettingsReader::VaultResolver.configuration) }
 
   let(:cache) { SettingsReader::VaultResolver::Cache.new }
-  let(:config) { SettingsReader::VaultResolver::Configuration.new }
   let(:address) { instance_double(SettingsReader::VaultResolver::Address, full_path: 'test') }
   let(:entry) { instance_double(SettingsReader::VaultResolver::Entry, address: address, renew: true) }
 
   before do
-    config.lease_renew_delay = 200
+    SettingsReader::VaultResolver.configuration.lease_renew_delay = 200
     cache.save(entry)
   end
 

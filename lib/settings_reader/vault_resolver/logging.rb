@@ -21,7 +21,7 @@ module SettingsReader
       private
 
       def log_message(severity, &block)
-        logger.log(severity) do
+        logger&.log(severity) do
           "[VaultResolver] #{block.call}"
         rescue StandardError => _e
           # Ignoring errors in log message
@@ -30,7 +30,7 @@ module SettingsReader
       end
 
       def logger
-        SettingsReader::VaultResolver.logger
+        config.logger
       end
     end
   end
