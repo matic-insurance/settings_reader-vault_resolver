@@ -5,8 +5,8 @@ module SettingsReader
     module Helpers
       # Helps with Vault authentication using kubernetes login
       class K8sAuth
-        def call(role)
-          secret = Vault.auth.kubernetes(role)
+        def call(role, route: nil, service_token_path: nil)
+          secret = Vault.auth.kubernetes(role, route: route, service_token_path: service_token_path)
 
           cache_token_for_renewal(secret)
           secret
