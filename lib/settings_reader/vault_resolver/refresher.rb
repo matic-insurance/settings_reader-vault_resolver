@@ -27,7 +27,7 @@ module SettingsReader
       end
 
       def refresh_entry(entry)
-        return unless entry.leased? && entry.expires_in < config.lease_renew_delay
+        return unless entry.expires_in < config.lease_renew_delay
 
         Concurrent::Promise.execute do
           debug { "Refreshing lease for #{entry}. Expires in: #{entry.expires_in}" }

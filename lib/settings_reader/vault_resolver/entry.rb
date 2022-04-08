@@ -13,7 +13,7 @@ module SettingsReader
       end
 
       def leased?
-        lease_id && lease_duration.positive?
+        @secret.renewable?
       end
 
       def expired?
@@ -54,8 +54,6 @@ module SettingsReader
       def to_s
         address.to_s
       end
-
-      private
 
       def lease_duration
         @secret.lease_duration.to_i

@@ -9,10 +9,9 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
   describe '.leased?' do
     subject { entry.leased? }
 
-    context 'when secret has lease and duration' do
+    context 'when secret is renewable' do
       before do
-        allow(secret).to receive(:lease_id).and_return('123')
-        allow(secret).to receive(:lease_duration).and_return(360)
+        allow(secret).to receive(:renewable?).and_return(true)
       end
 
       it { is_expected.to be_truthy }
@@ -20,8 +19,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
 
     context 'when secret has no lease id and duration' do
       before do
-        allow(secret).to receive(:lease_id).and_return(nil)
-        allow(secret).to receive(:lease_duration).and_return(0)
+        allow(secret).to receive(:renewable?).and_return(false)
       end
 
       it { is_expected.to be_falsey }
@@ -31,9 +29,9 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
   describe '.expired?' do
     subject { entry.expired? }
 
-    context 'when secret is not leased' do
+    context 'when secret is not renewable' do
       before do
-        allow(secret).to receive(:lease_id).and_return(nil)
+        allow(secret).to receive(:renewable?).and_return(false)
       end
 
       it { is_expected.to be_falsey }
@@ -41,7 +39,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
 
     context 'when secret is leased' do
       before do
-        allow(secret).to receive(:lease_id).and_return('123')
+        allow(secret).to receive(:renewable?).and_return(true)
         allow(secret).to receive(:lease_duration).and_return(60)
       end
 
@@ -66,7 +64,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
 
     context 'when secret is not leased' do
       before do
-        allow(secret).to receive(:lease_id).and_return(nil)
+        allow(secret).to receive(:renewable?).and_return(false)
       end
 
       it { is_expected.to eq(108_000) }
@@ -74,7 +72,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
 
     context 'when secret is leased' do
       before do
-        allow(secret).to receive(:lease_id).and_return('123')
+        allow(secret).to receive(:renewable?).and_return(true)
         allow(secret).to receive(:lease_duration).and_return(60)
       end
 
@@ -88,7 +86,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
   end
 
   describe '.renew' do
-    let(:renewed_secret) { instance_double(Vault::Secret, lease_id: '234', lease_duration: 60) }
+    let(:renewed_secret) { instance_double(Vault::Secret, renewable?: true, lease_id: '234', lease_duration: 60) }
 
     before do
       allow(Vault.sys).to receive(:renew).with('123').and_return(renewed_secret)
@@ -97,7 +95,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
 
     context 'when not leased' do
       before do
-        allow(secret).to receive(:lease_id).and_return(nil)
+        allow(secret).to receive(:renewable?).and_return(false)
       end
 
       it 'does not renew secret' do
@@ -116,6 +114,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
 
     context 'when leased' do
       before do
+        allow(secret).to receive(:renewable?).and_return(true)
         allow(secret).to receive(:lease_id).and_return('123')
       end
 
