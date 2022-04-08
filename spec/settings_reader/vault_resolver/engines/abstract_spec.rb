@@ -45,7 +45,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
   end
 
   describe '#renew' do
-    let(:renewed_secret) { instance_double(Vault::Secret, lease_id: '234', lease_duration: 60) }
+    let(:renewed_secret) { instance_double(Vault::Secret, renewable?: true, lease_duration: 60) }
     let(:entry) { SettingsReader::VaultResolver::Entry.new(address, secret) }
 
     before do
@@ -55,7 +55,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
 
     context 'when not leased' do
       before do
-        allow(secret).to receive(:lease_id).and_return(nil)
+        allow(secret).to receive(:renewable?).and_return(false)
       end
 
       it 'secret remains unchanged' do
@@ -69,7 +69,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
 
     context 'when leased' do
       before do
-        allow(secret).to receive(:lease_id).and_return('123')
+        allow(secret).to receive(:renewable?).and_return(true)
       end
 
       it 'secret is updated' do
@@ -83,7 +83,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
 
     context 'when renew exception' do
       before do
-        allow(secret).to receive(:lease_id).and_return('123')
+        allow(secret).to receive(:renewable?).and_return(true)
         allow(backend).to receive(:renew_lease).with(entry).and_raise(Vault::VaultError, 'test')
       end
 
