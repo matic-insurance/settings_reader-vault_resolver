@@ -31,7 +31,7 @@ module SettingsReader
 
         Concurrent::Promise.execute do
           debug { "Refreshing lease for #{entry}. Expires in: #{entry.expires_in}" }
-          entry.renew
+          config.vault_engine_for(entry.address).renew(entry)
           info { "Lease renewed for #{entry}. Expires in: #{entry.expires_in}" }
           entry
         rescue StandardError => e
