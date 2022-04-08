@@ -6,6 +6,10 @@ module SettingsReader
       # Default: Logger.new(STDOUT, level: Logger::ERROR)
       attr_accessor :logger
 
+      # How many times to retry retrieval of the secret
+      # Default: 2
+      attr_accessor :retrieval_retries
+
       # How often do we check if secret lease is about to expire
       # Default: 60seconds
       attr_accessor :lease_refresh_interval
@@ -13,6 +17,10 @@ module SettingsReader
       # Time before expiration when we try to renew the lease
       # Default: 300seconds
       attr_accessor :lease_renew_delay
+
+      # How many times to retry renew of the secret
+      # Default: 4
+      attr_accessor :lease_renew_retries
 
       # Block to be executed when lease is refreshed
       # Default: empty proc
@@ -24,8 +32,10 @@ module SettingsReader
 
       def initialize
         @logger = Logger.new($stdout, level: Logger::ERROR)
+        @retrieval_retries = 2
         @lease_refresh_interval = 60
         @lease_renew_delay = 300
+        @lease_renew_retries = 4
         @lease_renew_error_listener = proc {}
         @lease_renew_success_listener = proc {}
       end
