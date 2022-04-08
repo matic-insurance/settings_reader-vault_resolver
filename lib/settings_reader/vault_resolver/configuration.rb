@@ -40,6 +40,21 @@ module SettingsReader
         timer_task.execute
         timer_task
       end
+
+      def vault_engines
+        @vault_engines ||= [
+          SettingsReader::VaultResolver::Engines::KV2.new(self),
+          SettingsReader::VaultResolver::Engines::Database.new(self)
+        ]
+      end
+
+      def vault_engine_for(address)
+        unless (engine = vault_engines.detect { |e| e.retrieves?(address) })
+          raise SettingsReader::VaultResolver::Error, "Unknown engine for #{address}"
+        end
+
+        engine
+      end
     end
   end
 end
