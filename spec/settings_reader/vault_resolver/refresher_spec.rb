@@ -3,10 +3,12 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
   let(:cache) { SettingsReader::VaultResolver::Cache.new }
   let(:address) { instance_double(SettingsReader::VaultResolver::Address, full_path: 'test') }
-  let(:entry) { instance_double(SettingsReader::VaultResolver::Entry, address: address, renew: true) }
+  let(:entry) { instance_double(SettingsReader::VaultResolver::Entry, address: address) }
+  let(:engine) { instance_double(SettingsReader::VaultResolver::Engines::Abstract, renew: true) }
 
   before do
-    SettingsReader::VaultResolver.configuration.lease_renew_delay = 200
+    current_config.lease_renew_delay = 200
+    allow(current_config).to receive(:vault_engine_for).and_return(engine)
     cache.save(entry)
   end
 
@@ -18,7 +20,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
     it 'does not renew entry' do
       refresher.refresh
-      expect(entry).to_not have_received(:renew)
+      expect(engine).to_not have_received(:renew)
     end
 
     it 'returns empty list of refreshed promises' do
@@ -38,7 +40,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
       end
 
       it 'renews entry' do
-        expect(entry).to have_received(:renew)
+        expect(engine).to have_received(:renew).with(entry)
       end
 
       it 'returns list of fulfilled promises' do
@@ -57,7 +59,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
       end
 
       it 'renews entry' do
-        expect(entry).to_not have_received(:renew)
+        expect(engine).to_not have_received(:renew)
       end
 
       it 'returns empty list of refreshed promises' do
@@ -68,7 +70,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
     context 'when error is raised' do
       before do
         allow(entry).to receive(:expires_in).and_return 190
-        allow(entry).to receive(:renew).and_raise(SettingsReader::VaultResolver::Error, 'permission denied')
+        allow(engine).to receive(:renew).and_raise(SettingsReader::VaultResolver::Error, 'permission denied')
       end
 
       it 'handles error' do
