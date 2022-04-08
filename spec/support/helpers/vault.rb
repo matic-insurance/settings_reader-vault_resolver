@@ -34,4 +34,8 @@ RSpec.configure do |config|
   config.after(:each, :vault) do
     clear_vault_values
   end
+
+  config.before(:each, :vault_connection_error) do
+    Vault.address = 'http://127.0.0.1:8201'
+  end
 end

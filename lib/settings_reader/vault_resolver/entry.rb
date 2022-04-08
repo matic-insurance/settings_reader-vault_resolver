@@ -13,7 +13,7 @@ module SettingsReader
       end
 
       def leased?
-        @secret.lease_id && lease_duration.positive?
+        lease_id && lease_duration.positive?
       end
 
       def expired?
@@ -26,6 +26,15 @@ module SettingsReader
         return MONTH unless leased?
 
         @lease_started + lease_duration - Time.now
+      end
+
+      def lease_id
+        @secret.lease_id
+      end
+
+      def update_renewed(new_secret)
+        @secret = new_secret
+        @lease_started = Time.now
       end
 
       def renew
