@@ -27,7 +27,7 @@ module SettingsReader
 
         def k8s_auth(address)
           options = { route: address.options['route'], service_token_path: address.options['service_token_path'] }
-          secret = Vault.auth.kubernetes(address.options['role'], **options.compact)
+          secret = Vault.auth.kubernetes(address.options['role'], **options)
           secret&.auth
         end
       end

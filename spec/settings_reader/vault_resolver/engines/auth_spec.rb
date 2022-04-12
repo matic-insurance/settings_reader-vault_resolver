@@ -49,7 +49,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
 
         it 'passing right arguments' do
           get_value_from(address)
-          expect(Vault.auth).to have_received(:kubernetes).with('test_role')
+          expect(Vault.auth).to have_received(:kubernetes).with('test_role', route: nil, service_token_path: nil)
         end
       end
 
