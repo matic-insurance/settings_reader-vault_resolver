@@ -1,7 +1,7 @@
 RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
   let(:config) { SettingsReader::VaultResolver.configuration }
   let(:backend) { described_class.new(config) }
-  let(:address) { SettingsReader::VaultResolver::Address.new('vault://secret/test#foo') }
+  let(:address) { address_for('vault://secret/test#foo') }
   let(:secret) { instance_double(Vault::Secret) }
 
   describe '#retrieves?' do

@@ -18,7 +18,7 @@ RSpec.describe SettingsReader::VaultResolver::RefresherObserver do
   end
 
   context 'when one lease refreshed' do
-    let(:entry) { instance_double(SettingsReader::VaultResolver::Entry) }
+    let(:entry) { entry_double }
 
     it 'executes success listener' do
       observer.update(Time.now, [Concurrent::Promise.fulfill(entry)], nil)
@@ -38,7 +38,7 @@ RSpec.describe SettingsReader::VaultResolver::RefresherObserver do
   end
 
   context 'when multiple promises' do
-    let(:entry) { instance_double(SettingsReader::VaultResolver::Entry) }
+    let(:entry) { entry_double }
     let(:error) { SettingsReader::VaultResolver::Error.new('test') }
 
     it 'executes both listeners' do
