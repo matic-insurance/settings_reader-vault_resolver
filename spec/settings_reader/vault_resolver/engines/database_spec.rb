@@ -56,7 +56,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Database, :vault do
     protected
 
     def get_value_from(path)
-      address = SettingsReader::VaultResolver::Address.new(path)
+      address = address_for(path)
       entry = backend.get(address)
       entry&.value_for(address.attribute)
     end

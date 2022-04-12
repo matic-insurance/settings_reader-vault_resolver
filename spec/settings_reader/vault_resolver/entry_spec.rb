@@ -2,7 +2,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
   subject(:entry) { described_class.new(address, secret) }
 
   let(:secret) { instance_double(Vault::Secret) }
-  let(:address) { SettingsReader::VaultResolver::Address.new('vault://secret/key#attribute') }
+  let(:address) { address_for('vault://secret/key#attribute') }
 
   before { entry }
 

@@ -79,8 +79,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
     protected
 
     def get_value_from(address)
-      address = SettingsReader::VaultResolver::Address.new(address)
-      engine.get(address)
+      engine.get(address_for(address))
     end
   end
 

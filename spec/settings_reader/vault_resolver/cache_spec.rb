@@ -1,7 +1,7 @@
 require 'timecop'
 RSpec.describe SettingsReader::VaultResolver::Cache do
   subject(:cache) { described_class.new }
-  let(:address) { SettingsReader::VaultResolver::Address.new('vault://secret/key#attribute') }
+  let(:address) { address_for('vault://secret/key#attribute') }
   let(:secret) { instance_double(Vault::Secret, renewable?: nil) }
   let(:entry) { SettingsReader::VaultResolver::Entry.new(address, secret) }
 
@@ -15,8 +15,7 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
       end
 
       it 'returns entry for another attribute' do
-        address = SettingsReader::VaultResolver::Address.new('vault://secret/key#another')
-        expect(cache.retrieve(address)).to eq(entry)
+        expect(cache.retrieve(address_for('vault://secret/key#another'))).to eq(entry)
       end
 
       it 'returns entry in far future' do
@@ -55,8 +54,7 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
       before { cache.save(entry) }
 
       it 'returns nil' do
-        address = SettingsReader::VaultResolver::Address.new('vault://secret/another#attribute')
-        expect(cache.retrieve(address)).to eq(nil)
+        expect(cache.retrieve(address_for('vault://secret/another#attribute'))).to eq(nil)
       end
     end
   end

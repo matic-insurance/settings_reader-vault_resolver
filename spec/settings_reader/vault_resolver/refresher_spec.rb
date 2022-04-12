@@ -2,8 +2,7 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
   subject(:refresher) { described_class.new(cache, SettingsReader::VaultResolver.configuration) }
 
   let(:cache) { SettingsReader::VaultResolver::Cache.new }
-  let(:address) { instance_double(SettingsReader::VaultResolver::Address, full_path: 'test') }
-  let(:entry) { instance_double(SettingsReader::VaultResolver::Entry, address: address) }
+  let(:entry) { entry_double(address: address_double(full_path: 'test')) }
   let(:engine) { instance_double(SettingsReader::VaultResolver::Engines::Abstract, renew: true) }
 
   before do
