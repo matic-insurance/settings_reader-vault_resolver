@@ -34,12 +34,29 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
     end
 
     context 'when vault exception raised' do
-      before do
-        allow(backend).to receive(:get_secret).with(address).and_raise(Vault::VaultError, 'test')
+      context 'when connection exception happened less then retries' do
+        before do
+          error = Vault::HTTPConnectionError.new('test_address', SocketError.new('test'))
+          allow(backend).to receive(:get_secret, &sporadic_exceptions(secret, error, result_after: 1))
+        end
+
+        it 'returns entry with secret' do
+          entry = backend.get(address)
+          expect(entry.address).to eq(address)
+          expect(entry.secret).to eq(secret)
+        end
       end
 
-      it 'wraps exception' do
-        expect { backend.get(address) }.to raise_error(SettingsReader::VaultResolver::Error, 'test')
+      context 'when connection exception happened more then retries' do
+        before do
+          error = Vault::HTTPConnectionError.new('test_address', SocketError.new('test'))
+          allow(backend).to receive(:get_secret, &sporadic_exceptions(secret, error, result_after: 3))
+        end
+
+        it 'raises exception' do
+          message = /The Vault server at `test_address' is not currently/
+          expect { backend.get(address) }.to raise_error(SettingsReader::VaultResolver::Error, message)
+        end
       end
     end
   end
@@ -81,15 +98,57 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
       end
     end
 
-    context 'when renew exception' do
+    context 'when renew connection exception' do
       before do
+        @call_count = 0
         allow(secret).to receive(:renewable?).and_return(true)
-        allow(backend).to receive(:renew_lease).with(entry).and_raise(Vault::VaultError, 'test')
       end
 
-      it 'raises exception' do
-        expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error, 'test')
+      context 'when connection exception happened less then retries' do
+        before do
+          error = Vault::HTTPConnectionError.new('test_address', SocketError.new('test'))
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 3))
+        end
+
+        it 'secret is updated' do
+          expect { backend.renew(entry) }.to change(entry, :secret).to(renewed_secret)
+        end
       end
+
+      context 'when connection exception happened more then retries' do
+        before do
+          error = Vault::HTTPConnectionError.new('test_address', SocketError.new('test'))
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 5))
+        end
+
+        it 'raises exception' do
+          message = /The Vault server at `test_address' is not currently/
+          expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error, message)
+        end
+      end
+
+      context 'when server/client exception happened once' do
+        before do
+          error = Vault::HTTPError.new('address', double(:response, code: 503), %w[error1 error2])
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 3))
+        end
+
+        it 'raises exception' do
+          message = /The Vault server at `address' responded with a 503/
+          expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error, message)
+        end
+      end
+    end
+  end
+
+  protected
+
+  def sporadic_exceptions(result, error, result_after: 5)
+    call_count = 0
+    proc do
+      raise error unless (call_count += 1) > result_after
+
+      result
     end
   end
 end

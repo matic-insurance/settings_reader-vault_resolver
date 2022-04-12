@@ -14,7 +14,7 @@ module SettingsReader
         def get_secret(address)
           debug { "Fetching new database secret at: #{address}" }
           Vault.logical.read(address.full_path)
-        rescue Vault::VaultError => e
+        rescue Vault::HTTPClientError => e
           return nil if e.message.include?('* unknown role')
 
           raise e

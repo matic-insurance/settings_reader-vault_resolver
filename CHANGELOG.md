@@ -5,6 +5,7 @@
 - Reworked authentication helpers interface
 
 ### New features
+- Retry secret retrieval and renewal
 - Capture more vault exceptions including connectivity errors
 - Introduce vault engine adapter concept
 - Separate kv, database, and auth engine logic 
