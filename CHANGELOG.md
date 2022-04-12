@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.4.0]
+### Breaking changes
+- Reworked authentication helpers interface
+
+### New features
+- Capture more vault exceptions including connectivity errors
+- Introduce vault engine adapter concept
+- Separate kv, database, and auth engine logic 
+
 ## [0.3.0]
 ### Breaking changes
 - Require configuration before use
@@ -45,8 +54,9 @@
 - Secrets caching
 - Automatic secrets lease renewal
 
-[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.3.0...HEAD
-[0.2.4]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.3.0
+[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.4.0
+[0.3.0]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.3.0
 [0.2.4]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.4
 [0.2.3]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.3
 [0.2.2]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.2
