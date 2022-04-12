@@ -7,6 +7,10 @@ module Helpers
     def address_for(path)
       SettingsReader::VaultResolver::Address.new(path)
     end
+
+    def build_entry_for(path, secret)
+      SettingsReader::VaultResolver::Entry.new(address_for(path), secret)
+    end
   end
 end
 

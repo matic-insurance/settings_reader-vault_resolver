@@ -44,7 +44,8 @@ module SettingsReader
       def vault_engines
         @vault_engines ||= [
           SettingsReader::VaultResolver::Engines::KV2.new(self),
-          SettingsReader::VaultResolver::Engines::Database.new(self)
+          SettingsReader::VaultResolver::Engines::Database.new(self),
+          SettingsReader::VaultResolver::Engines::Auth.new(self)
         ]
       end
 
