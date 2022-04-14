@@ -2,8 +2,7 @@ require 'settings_reader/vault_resolver/helpers/vault_authentication'
 
 RSpec.describe SettingsReader::VaultResolver::Helpers::VaultAuthentication do
   let(:helper) { described_class.new }
-  let(:auth_secret) { instance_double(Vault::SecretAuth, client_token: 'vault_client_token', renewable?: true) }
-  let(:secret) { vault_secret_double(auth: auth_secret) }
+  let(:secret) { vault_secret_double(auth: vault_auth_double(client_token: 'vault_client_token', renewable?: true)) }
 
   before do
     allow(Vault.auth).to receive(:kubernetes).and_return(secret)

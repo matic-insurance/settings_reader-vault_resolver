@@ -108,7 +108,7 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
     end
 
     context 'when no data available' do
-      let(:secret) { instance_double(Vault::SecretAuth) }
+      let(:secret) { vault_auth_double }
 
       before do
         allow(secret).to receive(:client_token).and_return('a')
