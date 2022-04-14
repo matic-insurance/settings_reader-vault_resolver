@@ -9,7 +9,8 @@ module Helpers
     end
 
     def build_entry_for(path, secret)
-      SettingsReader::VaultResolver::Entry.new(address_for(path), secret)
+      address = path.is_a?(String) ? address_for(path) : path
+      SettingsReader::VaultResolver::Entry.new(address, secret)
     end
 
     def entry_double(options = {})
@@ -22,6 +23,10 @@ module Helpers
 
     def vault_secret_double(options = {})
       instance_double(Vault::Secret, options)
+    end
+
+    def vault_auth_double(options = {})
+      instance_double(Vault::SecretAuth, options)
     end
   end
 end

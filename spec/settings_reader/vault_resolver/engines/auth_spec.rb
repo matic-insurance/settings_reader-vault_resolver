@@ -31,8 +31,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
   end
 
   describe '#get' do
-    let(:secret_auth) { instance_double(Vault::SecretAuth, client_token: 'client_token_data') }
-    let(:secret) { instance_double(Vault::Secret, auth: secret_auth) }
+    let(:secret) { vault_secret_double(auth: vault_auth_double(client_token: 'client_token_data')) }
 
     context 'when k8s auth' do
       before do
@@ -43,8 +42,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
         let(:address) { 'vault://auth/kubernetes/login?role=test_role#client_token' }
 
         it 'returns token' do
-          value = get_value_from(address)
-          expect(value.secret).to eq(secret_auth)
+          expect(get_value_from(address).secret).to eq(secret.auth)
         end
 
         it 'passing right arguments' do
@@ -57,8 +55,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
         let(:address) { 'vault://auth/kubernetes/login?role=role&route=route&service_token_path=path#client_token' }
 
         it 'returns token' do
-          value = get_value_from(address)
-          expect(value.secret).to eq(secret_auth)
+          expect(get_value_from(address).secret).to eq(secret.auth)
         end
 
         it 'passing right arguments' do
@@ -85,16 +82,15 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
 
   describe '#renew' do
     let(:entry) { build_entry_for('vault://auth/kubernetes/login#client_token', old_secret) }
-    let(:secret_auth) { instance_double(Vault::SecretAuth, renewable?: true, lease_duration: 120) }
-    let(:new_secret) { instance_double(Vault::Secret, auth: secret_auth) }
-    let(:old_secret) { instance_double(Vault::SecretAuth, renewable?: true, lease_duration: 120) }
+    let(:new_secret) { vault_secret_double(auth: vault_auth_double(renewable?: true, lease_duration: 120)) }
+    let(:old_secret) { vault_auth_double(renewable?: true, lease_duration: 120) }
 
     before do
       allow(Vault.client.auth_token).to receive(:renew_self).and_return(new_secret)
     end
 
     it 'updates secret' do
-      expect { engine.renew(entry) }.to change(entry, :secret).to(secret_auth)
+      expect { engine.renew(entry) }.to change(entry, :secret).to(new_secret.auth)
     end
 
     it 'updates expiration' do

@@ -2,7 +2,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
   let(:config) { SettingsReader::VaultResolver.configuration }
   let(:backend) { described_class.new(config) }
   let(:address) { address_for('vault://secret/test#foo') }
-  let(:secret) { instance_double(Vault::Secret) }
+  let(:secret) { vault_secret_double }
 
   describe '#retrieves?' do
     it 'raising error' do
@@ -62,8 +62,8 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
   end
 
   describe '#renew' do
-    let(:renewed_secret) { instance_double(Vault::Secret, renewable?: true, lease_duration: 60) }
-    let(:entry) { SettingsReader::VaultResolver::Entry.new(address, secret) }
+    let(:renewed_secret) { vault_secret_double(renewable?: true, lease_duration: 60) }
+    let(:entry) { build_entry_for(address, secret) }
 
     before do
       allow(backend).to receive(:renew_lease).with(entry).and_return(renewed_secret)
