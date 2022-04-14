@@ -33,6 +33,9 @@ RSpec.configure do |config|
     SettingsReader::VaultResolver.configure do |conf|
       conf.logger = Logger.new($stdout, level: Logger::FATAL)
     end
+  end
+
+  config.after(:each) do
     SettingsReader::VaultResolver.cache.clear_all
   end
 end
