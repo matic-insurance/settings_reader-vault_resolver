@@ -19,6 +19,10 @@ module Helpers
     def address_double(options = {})
       instance_double(SettingsReader::VaultResolver::Address, options)
     end
+
+    def vault_secret_double(options = {})
+      instance_double(Vault::Secret, options)
+    end
   end
 end
 
@@ -29,5 +33,6 @@ RSpec.configure do |config|
     SettingsReader::VaultResolver.configure do |conf|
       conf.logger = Logger.new($stdout, level: Logger::FATAL)
     end
+    SettingsReader::VaultResolver.cache.clear_all
   end
 end

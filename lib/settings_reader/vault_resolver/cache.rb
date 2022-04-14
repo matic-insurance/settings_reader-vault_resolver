@@ -36,6 +36,10 @@ module SettingsReader
         @secrets.each_value(&block)
       end
 
+      def clear_all
+        @secrets = {}
+      end
+
       private
 
       def cache_key(address)
