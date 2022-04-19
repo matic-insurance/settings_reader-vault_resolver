@@ -38,7 +38,7 @@ module SettingsReader
       end
 
       def value_for(attribute)
-        return secret.data[attribute.to_sym] if secret.respond_to?(:data) && secret.data.key?(attribute.to_sym)
+        return secret.data[attribute.to_sym] if secret.respond_to?(:data) && secret.data&.key?(attribute.to_sym)
         return secret.public_send(attribute) if secret.respond_to?(attribute)
 
         nil
