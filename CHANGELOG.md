@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+## [0.4.2]
+### Fixes
+- Fix lost secret data after lease renewal
+- Fix exception when getting value from secret with nil data
+
+## [0.4.1]
+### Changes
+- Broader entry secret data access to allow retrieval of secret attributes
+
+### Fixes
+- Fix exception when retrieving authenticating via k8s endpoint
+
+### New features
+- Retry secret retrieval and renewal
+- Capture more vault exceptions including connectivity errors
+- Introduce vault engine adapter concept
+- Separate kv, database, and auth engine logic
+
 ## [0.4.0]
 ### Breaking changes
 - Reworked authentication helpers interface
@@ -55,7 +73,9 @@
 - Secrets caching
 - Automatic secrets lease renewal
 
-[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/matic-insurance/settings_reader-vault_resolver/compare/0.4.2...HEAD
+[0.4.2]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.4.2
+[0.4.1]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.4.1
 [0.4.0]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.4.0
 [0.3.0]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.3.0
 [0.2.4]: https://github.com/matic-insurance/settings_reader-vault_resolver/commits/0.2.4
