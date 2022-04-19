@@ -123,5 +123,22 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
         expect(entry.value_for(:missing)).to eq(nil)
       end
     end
+
+    context 'when data is nil' do
+      let(:secret) { vault_secret_double(data: nil) }
+
+      before do
+        allow(secret).to receive(:lease_duration).and_return(123)
+      end
+
+      it 'returns value for valid attribute' do
+        expect(entry.value_for('lease_duration')).to eq(123)
+        expect(entry.value_for(:lease_duration)).to eq(123)
+      end
+
+      it 'returns nil for missing key' do
+        expect(entry.value_for(:missing)).to eq(nil)
+      end
+    end
   end
 end
