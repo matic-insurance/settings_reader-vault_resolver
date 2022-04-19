@@ -22,7 +22,8 @@ module Helpers
     end
 
     def vault_secret_double(options = {})
-      instance_double(Vault::Secret, options)
+      defaults = { data: {} }
+      instance_double(Vault::Secret, defaults.merge(options))
     end
 
     def vault_auth_double(options = {})

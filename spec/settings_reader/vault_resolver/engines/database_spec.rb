@@ -69,6 +69,10 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Database, :vault do
       expect { backend.renew(entry) }.to change(entry, :secret)
     end
 
+    it 'maintains secret data' do
+      expect { backend.renew(entry) }.not_to(change { entry.value_for('username') })
+    end
+
     it 'updates expiration' do
       expect { backend.renew(entry) }.to change(entry, :expires_in).to be_within(1).of(60)
     end
