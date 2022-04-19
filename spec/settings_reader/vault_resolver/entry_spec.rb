@@ -141,4 +141,67 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
       end
     end
   end
+
+  describe '#update_renewed' do
+    context 'when updating regular secret' do
+      let(:secret) { vault_secret_double(data: { foo: 'bar' }, lease_duration: 300, renewable?: true) }
+
+      it 'refreshing lease' do
+        Timecop.freeze do
+          expect(entry.expires_in).to be_within(1).of(300)
+          Timecop.travel Time.now + 120
+          entry.update_renewed(vault_secret_double(data: nil, lease_duration: 300, renewable?: true))
+          expect(entry.expires_in).to be_within(1).of(300)
+        end
+      end
+
+      context 'when new secret have no data' do
+        let(:new_secret) { vault_secret_double(data: nil, lease_duration: 300, renewable?: true) }
+
+        it 'updates secret' do
+          expect { entry.update_renewed(new_secret) }.to change(entry, :secret).to(new_secret)
+        end
+
+        it 'does not changing data' do
+          expect { entry.update_renewed(new_secret) }.not_to change(entry, :data)
+        end
+      end
+
+      context 'when new secret have data' do
+        let(:new_secret) do
+          vault_secret_double(data: { foo: 'baz', bar: 'foo' }, lease_duration: 300, renewable?: true)
+        end
+
+        it 'updates secret' do
+          expect { entry.update_renewed(new_secret) }.to change(entry, :secret).to(new_secret)
+        end
+
+        it 'changing data' do
+          expect { entry.update_renewed(new_secret) }.to change(entry, :data).to(foo: 'baz', bar: 'foo')
+        end
+      end
+    end
+
+    context 'when updating auth secret' do
+      let(:secret) { vault_auth_double(lease_duration: 300, renewable?: true, client_token: 'test') }
+      let(:new_secret) { vault_secret_double(lease_duration: 300, renewable?: true) }
+
+      it 'refreshing lease' do
+        Timecop.freeze do
+          expect(entry.expires_in).to be_within(1).of(300)
+          Timecop.travel Time.now + 120
+          entry.update_renewed(vault_secret_double(data: nil, lease_duration: 300, renewable?: true))
+          expect(entry.expires_in).to be_within(1).of(300)
+        end
+      end
+
+      it 'updates secret' do
+        expect { entry.update_renewed(new_secret) }.to change(entry, :secret).to(new_secret)
+      end
+
+      it 'does not changing data' do
+        expect { entry.update_renewed(new_secret) }.not_to change(entry, :data)
+      end
+    end
+  end
 end

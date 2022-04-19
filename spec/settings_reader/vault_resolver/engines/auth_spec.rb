@@ -93,6 +93,10 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
       expect { engine.renew(entry) }.to change(entry, :secret).to(new_secret.auth)
     end
 
+    it 'maintains secret data' do
+      expect { engine.renew(entry) }.not_to(change { entry.value_for('client_token') })
+    end
+
     it 'updates expiration' do
       expect { engine.renew(entry) }.to change(entry, :expires_in).to be_within(1).of(120)
     end
