@@ -16,22 +16,12 @@ jobs:
         type: string
     docker:
       - image: cimg/ruby:<< parameters.ruby-version >>
-        environment:
-          DATABASE_URL: postgresql://app:pass@localhost:5432/test
-          REDIS_URL: redis://localhost:6379/0
-          DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: 'true'
-          CODECOV_FLAGS: backend
-      - image: postgres:10.17-alpine
-        environment:
-          POSTGRES_USER: app
-          POSTGRES_PASSWORD: pass
-      - image: redis:5.0-alpine
     steps:
       - checkout
       - ruby/install-deps
       - run:
           name: Run RSpec Tests
-          command: bash ops/scripts/run_parallel_tests.sh
+          command: bundle exec rspec
       - store_test_results:
           path: reports/rspec
       - store_artifacts:
