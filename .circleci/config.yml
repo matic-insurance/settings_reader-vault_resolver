@@ -1,30 +1,68 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
+
 version: 2.1
 
-# Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
-# See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
-  ruby: circleci/ruby@1.4.0
+  aws-ecr: circleci/aws-ecr@6.15.3
+  aws-cli: circleci/aws-cli@1.4.0
+  aws-eks: circleci/aws-eks@1.0.3
+  ci: matic/orb-common@0.2
+  ruby: circleci/ruby@1.8.0
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  build:
+
+  rspec-test:
+    parameters:
+      ruby-version:
+        type: string
     docker:
-      - image: cimg/ruby:3.1.0
-    executor: ruby/default
+      - image: cimg/ruby:<< parameters.ruby-version >>
+        environment:
+          DATABASE_URL: postgresql://app:pass@localhost:5432/test
+          REDIS_URL: redis://localhost:6379/0
+          DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: 'true'
+          CODECOV_FLAGS: backend
+      - image: postgres:10.17-alpine
+        environment:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: pass
+      - image: redis:5.0-alpine
     steps:
       - checkout
+      - ruby/install-deps
       - run:
-          name: Which bundler?
-          command: bundle -v
-      - ruby/bundle-install
+          name: Run RSpec Tests
+          command: bash ops/scripts/run_parallel_tests.sh
+      - store_test_results:
+          path: reports/rspec
+      - store_artifacts:
+          path: reports/rspec
+      - ci/slack-stage-message
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  rubocop:
+    docker:
+      - image: cimg/ruby:2.7.5
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Run rubocop
+          command: bundle exec rubocop --parallel
+
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+
+  settings_reader-vault_resolver.build-pull-request:
+    when:
+      not:
+        equal: [ main, << pipeline.git.branch >> ]
     jobs:
-      - build
+
+      - rspec-test:
+          name: Rspec-test
+          context: global
+          matrix:
+            parameters:
+              ruby-version: [ '2.5', '2.6', '2.7', '3.0' ]
+
+      - rubocop:
+          name: Rubocop
+          context: global
