@@ -49,13 +49,42 @@ jobs:
   rubocop:
     resource_class: small
     docker:
-      - image: cimg/ruby:2.7.5
+      - image: cimg/ruby:2.5
     steps:
       - checkout
       - ruby/install-deps
       - run:
           name: Run rubocop
           command: bundle exec rubocop --parallel
+
+  release:
+    parameters:
+      tag:
+        type: string
+        default: "default-tag"
+    docker:
+      - image: cimg/ruby:2.7.5
+    environment:
+      RELEASE_TAG: << parameters.tag >>
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Set up credentials
+          command: |
+              mkdir -p $HOME/.gem
+              touch $HOME/.gem/credentials
+              chmod 0600 $HOME/.gem/credentials
+              printf -- "---\n:rubygems_api_key: $RUBYGEMS_API_KEY\n" > $HOME/.gem/credentials
+      - run:
+          name: Set version
+          command: sed -i "s/[[:digit:]].[[:digit:]].[[:digit:]]/${RELEASE_TAG}/g" $(find . -name "version.rb")
+      - run:
+          name: Build gem
+          command: gem build *.gemspec
+      - run:
+          name: Push gem
+          command: gem push *.gem
 
 workflows:
 
@@ -74,3 +103,15 @@ workflows:
       - rubocop:
           name: Rubocop
           context: global
+
+  settings_reader-vault_resolver.release:
+    jobs:
+
+      - release:
+          tag: << pipeline.git.tag >>
+          context: gem-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /\d\.\d\.\d/ # It should be [digin dot digit dot digit] format
