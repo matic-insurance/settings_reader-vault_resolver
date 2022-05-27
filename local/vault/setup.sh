@@ -40,7 +40,7 @@ vault POST "v1/database/config/app_db" \
     '{
        "plugin_name": "postgresql-database-plugin",
        "allowed_roles": "app-user",
-       "connection_url": "postgresql://{{username}}:{{password}}@0.0.0.0:5432/app_db?sslmode=disable",
+       "connection_url": "postgresql://{{username}}:{{password}}@127.0.0.1:5432/app_db?sslmode=disable",
        "username": "vault_root",
        "password": "root_password"
      }'
