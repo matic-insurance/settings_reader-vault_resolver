@@ -29,6 +29,9 @@ jobs:
       - checkout
       - ruby/install-deps
       - run:
+          name: Set up vault
+          command: bash local/vault/setup.sh
+      - run:
           name: Run RSpec Tests
           command: bundle exec rspec
       - store_test_results:
