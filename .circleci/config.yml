@@ -27,9 +27,9 @@ jobs:
           SKIP_SETCAP: true
       - image: postgres:14.1-alpine
         environment:
+          POSTGRES_DB: 'app_db'
           POSTGRES_USER: 'vault_root'
           POSTGRES_PASSWORD: 'root_password'
-          POSTGRES_DB: 'app_db'
     steps:
       - checkout
       - ruby/install-deps
