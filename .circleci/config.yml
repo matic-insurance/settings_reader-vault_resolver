@@ -47,6 +47,7 @@ jobs:
       - ci/slack-stage-message
 
   rubocop:
+    resource_class: small
     docker:
       - image: cimg/ruby:2.7.5
     steps:
