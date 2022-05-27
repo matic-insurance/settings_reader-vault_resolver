@@ -64,7 +64,6 @@ workflows:
     jobs:
 
       - rspec-test:
-          name: Rspec-test
           context: global
           matrix:
             parameters:
