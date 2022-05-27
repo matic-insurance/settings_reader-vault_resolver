@@ -16,6 +16,15 @@ jobs:
         type: string
     docker:
       - image: cimg/ruby:<< parameters.ruby-version >>
+      - image: vault
+        environment:
+          VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
+          SKIP_SETCAP: true
+      - image: postgres:14.1-alpine
+        environment:
+          POSTGRES_USER: 'vault_root'
+          POSTGRES_PASSWORD: 'root_password'
+          POSTGRES_DB: 'app_db'
     steps:
       - checkout
       - ruby/install-deps
