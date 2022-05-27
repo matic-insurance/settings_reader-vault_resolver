@@ -11,6 +11,7 @@ orbs:
 jobs:
 
   rspec-test:
+    resource_class: small
     parameters:
       ruby-version:
         type: string
