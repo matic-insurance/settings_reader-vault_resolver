@@ -2,6 +2,7 @@
 version: 2.1
 
 orbs:
+  ci: matic/orb-common@0.2
   ruby: circleci/ruby@1.8.0
 
 jobs:
