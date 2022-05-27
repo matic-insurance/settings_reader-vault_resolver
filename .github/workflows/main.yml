@@ -10,64 +10,6 @@ on:
     types: [published]
 
 jobs:
-  build:
-    env:
-      COVERAGE: true
-      CODECOV_TOKEN: a0c859b6-dfb7-4d9f-9933-2dd945cdd960
-      VAULT_ADDR: 'http://127.0.0.1:8200'
-      VAULT_TOKEN: 'vault_root_token'
-
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ruby: [ '2.5.x', '2.6.x', '2.7.x', '3.0.x' ]
-    services:
-      vault:
-        image: vault
-        ports:
-          - "8200:8200"
-        env:
-          VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
-          SKIP_SETCAP: true
-      db:
-        image: postgres:14.1-alpine
-        ports:
-          - "5432:5432"
-        env:
-          POSTGRES_USER: 'vault_root'
-          POSTGRES_PASSWORD: 'root_password'
-          POSTGRES_DB: 'app_db'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Cache dependencies
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ runner.OS }}-ruby-${{ matrix.ruby }}
-          restore-keys: ${{ runner.OS }}-
-
-      - name: Set up Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-      - name: Set up Bundler
-        run: gem install bundler:2.1.4
-      - name: Set up Dependencies
-        run: bundle install --path vendor/bundle
-      - name: Set up Vault
-        run: sh local/vault/setup.sh
-
-      - name: Run specs
-        env:
-          COVERAGE: true
-        run: bundle exec rspec
-
-      - name: Upload coverage
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: bash <(curl -s https://codecov.io/bash)
 
   release:
     runs-on: ubuntu-latest
