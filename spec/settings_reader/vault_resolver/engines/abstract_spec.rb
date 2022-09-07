@@ -5,7 +5,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
   let(:secret) { vault_secret_double }
 
   describe '#retrieves?' do
-    it 'raising error' do
+    it 'raises error' do
       expect { backend.retrieves?(address) }.to raise_error(NotImplementedError)
     end
   end
@@ -57,6 +57,57 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
           message = /The Vault server at `test_address' is not currently/
           expect { backend.get(address) }.to raise_error(SettingsReader::VaultResolver::Error, message)
         end
+      end
+
+      context 'when authentication exception is raised once' do
+        before do
+          config.vault_initializer = vault_initializer
+
+          error = Vault::HTTPClientError.new('address', double(code: 403))
+          allow(backend).to receive(:get_secret, &sporadic_exceptions(secret, error, result_after: 1))
+        end
+
+        let(:vault_initializer) { double(call: nil) }
+
+        it 'reauthenticates' do
+          backend.get(address)
+          expect(vault_initializer).to have_received(:call).once
+        end
+
+        it { expect { backend.get(address) }.not_to raise_error }
+
+        it 'returns entry with secret' do
+          entry = backend.get(address)
+          expect(entry.address).to eq(address)
+          expect(entry.secret).to eq(secret)
+        end
+      end
+
+      context 'when Vault::HTTPClientError is raised, but it is not authentication exception' do
+        before do
+          error = Vault::HTTPClientError.new('address', double(code: 400))
+          allow(backend).to receive(:get_secret, &sporadic_exceptions(secret, error, result_after: 1))
+        end
+
+        it { expect { backend.get(address) }.to raise_error(SettingsReader::VaultResolver::Error) }
+      end
+
+      context 'when authentication exception is raised after reauthentication' do
+        before do
+          config.vault_initializer = vault_initializer
+
+          error = Vault::HTTPClientError.new('address', double(code: 403))
+          allow(backend).to receive(:get_secret, &sporadic_exceptions(secret, error, result_after: 2))
+        end
+
+        let(:vault_initializer) { double(call: nil) }
+
+        it 'reauthenticates' do
+          backend.get(address) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
+          expect(vault_initializer).to have_received(:call).once
+        end
+
+        it { expect { backend.get(address) }.to raise_error(SettingsReader::VaultResolver::Error) }
       end
     end
   end
@@ -137,6 +188,61 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
           message = /The Vault server at `address' responded with a 503/
           expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error, message)
         end
+      end
+    end
+
+    describe 'authentication problems' do
+      context 'when authentication exception is raised once' do
+        before do
+          config.vault_initializer = vault_initializer
+          allow(secret).to receive(:renewable?).and_return(true)
+
+          error = Vault::HTTPClientError.new('address', double(code: 403))
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 1))
+        end
+
+        let(:vault_initializer) { double(call: nil) }
+
+        it 'reauthenticates' do
+          backend.renew(entry)
+          expect(vault_initializer).to have_received(:call).once
+        end
+
+        it { expect { backend.renew(entry) }.not_to raise_error }
+
+        it 'secret is updated' do
+          expect { backend.renew(entry) }.to change(entry, :secret).to(renewed_secret)
+        end
+      end
+
+      context 'when Vault::HTTPClientError is raised, but it is not authentication exception' do
+        before do
+          allow(secret).to receive(:renewable?).and_return(true)
+
+          error = Vault::HTTPClientError.new('address', double(code: 400))
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 1))
+        end
+
+        it { expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error) }
+      end
+
+      context 'when authentication exception is raised after reauthentication' do
+        before do
+          config.vault_initializer = vault_initializer
+          allow(secret).to receive(:renewable?).and_return(true)
+
+          error = Vault::HTTPClientError.new('address', double(code: 403))
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 2))
+        end
+
+        let(:vault_initializer) { double(call: nil) }
+
+        it 'reauthenticates' do
+          backend.renew(entry) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
+          expect(vault_initializer).to have_received(:call).once
+        end
+
+        it { expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error) }
       end
     end
   end
