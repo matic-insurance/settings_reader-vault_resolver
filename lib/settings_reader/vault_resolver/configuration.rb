@@ -30,14 +30,19 @@ module SettingsReader
       # Default: empty proc
       attr_accessor :lease_renew_error_listener
 
+      # Block to be executed for initialization and authorization
+      # Default: empty proc
+      attr_accessor :vault_initializer
+
       def initialize
         @logger = Logger.new($stdout, level: Logger::ERROR)
         @retrieval_retries = 2
         @lease_refresh_interval = 60
         @lease_renew_delay = 300
         @lease_renew_retries = 4
-        @lease_renew_error_listener = proc {}
-        @lease_renew_success_listener = proc {}
+        @lease_renew_error_listener = -> {}
+        @lease_renew_success_listener = -> {}
+        @vault_initializer = -> {}
       end
 
       def setup_lease_refresher(cache, previous_task = nil)

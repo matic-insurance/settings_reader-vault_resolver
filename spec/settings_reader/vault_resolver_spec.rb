@@ -14,9 +14,16 @@ RSpec.describe SettingsReader::VaultResolver do
   end
 
   describe '.configure' do
+    let(:initializer) { double(call: nil) }
+
     it 'yields configuration' do
       config = instance_of(SettingsReader::VaultResolver::Configuration)
       expect { |b| described_class.configure(&b) }.to yield_with_args(config)
+    end
+
+    it 'runs Vault initialization' do
+      described_class.configure { |config| config.vault_initializer = initializer }
+      expect(initializer).to have_received(:call).once
     end
   end
 

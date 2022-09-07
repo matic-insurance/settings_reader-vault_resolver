@@ -33,7 +33,8 @@ AppSettings = SettingsReader.load do |config|
   # Configure vault resolver
   SettingsReader::VaultResolver.configure do |vault_resolver_config|
     vault_resolver_config.logger = Rails.logger
-    # ... VaultResolver configurations
+    vault_resolver_config.vault_initializer = -> { authenticate_vault }
+    # ... other VaultResolver configurations
   end
   
   # Add vault resolver as one of resolvers
