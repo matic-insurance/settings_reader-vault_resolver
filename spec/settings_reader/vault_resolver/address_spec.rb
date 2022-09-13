@@ -46,4 +46,26 @@ RSpec.describe SettingsReader::VaultResolver::Address do
       expect(address.options).to eq('renew' => 'false')
     end
   end
+
+  describe '#no_cache?' do
+    subject(:address) { described_class.new(path) }
+
+    context 'without no_cache param' do
+      let(:path) { 'vault://database/path/to/role?renew=false#username' }
+
+      it { expect(address.no_cache?).to eq(false) }
+    end
+
+    context 'when no_cache param is false' do
+      subject(:address) { described_class.new('vault://database/path/to/role?renew=false&no_cache=false#username') }
+
+      it { expect(address.no_cache?).to eq(false) }
+    end
+
+    context 'when no_cache param is true' do
+      subject(:address) { described_class.new('vault://database/path/to/role?renew=false&no_cache=true#username') }
+
+      it { expect(address.no_cache?).to eq(true) }
+    end
+  end
 end

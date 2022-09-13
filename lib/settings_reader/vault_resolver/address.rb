@@ -26,6 +26,10 @@ module SettingsReader
         URI.decode_www_form(@uri.query || '').to_h
       end
 
+      def no_cache?
+        options['no_cache'] == 'true'
+      end
+
       def to_s
         @uri.to_s
       end

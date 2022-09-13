@@ -16,6 +16,24 @@ module Helpers
       end
       self.vault_keys = []
     end
+
+    def vault_auth_error
+      Vault::HTTPError.new('auth/test', double(code: 403))
+    end
+
+    def retrieve_new_vault_token
+      Vault.address = 'http://127.0.0.1:8200'
+      Vault.token = 'vault_root_token'
+
+      # Use token with custom policy to access the vault
+      secret = Vault.auth_token.create(policies: %(app))
+      Vault.token = secret.auth.client_token
+      secret
+    end
+
+    def invalidate_vault_authentication
+      Vault.auth_token.revoke_self
+    end
   end
 end
 
@@ -23,12 +41,7 @@ RSpec.configure do |config|
   config.include(Helpers::VaultHelpers, :vault)
 
   config.before(:each, :vault) do
-    Vault.address = 'http://127.0.0.1:8200'
-    Vault.token = 'vault_root_token'
-
-    # Use token with custom policy to access the vault
-    secret = Vault.auth_token.create(policies: %(app))
-    Vault.token = secret.auth.client_token
+    retrieve_new_vault_token
   end
 
   config.after(:each, :vault) do

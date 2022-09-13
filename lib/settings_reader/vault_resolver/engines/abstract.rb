@@ -16,7 +16,7 @@ module SettingsReader
         end
 
         def get(address)
-          return unless (vault_secret = get_secret_with_authentication(address))
+          return unless (vault_secret = get_and_retry_auth(address))
 
           wrap_secret(address, vault_secret)
         rescue Vault::VaultError => e
@@ -26,7 +26,7 @@ module SettingsReader
         def renew(entry)
           return unless entry.leased?
 
-          new_secret = renew_lease_with_authentication(entry)
+          new_secret = renew_and_retry_auth(entry)
           entry.update_renewed(new_secret)
           true
         rescue Vault::VaultError => e
@@ -35,31 +35,31 @@ module SettingsReader
 
         protected
 
-        def get_secret_with_authentication(address)
-          get_secret_with_retries(address)
-        rescue Vault::HTTPClientError => e # if not authenticated, let's reauthenticate and try once more
-          raise unless e.code == 403
+        def get_and_retry_auth(address)
+          get_and_retry_connection(address)
+        rescue Vault::HTTPError => e # if not authenticated, let's reauthenticate and try once more
+          raise unless auth_error?(e)
 
           config.vault_initializer.call
-          get_secret_with_retries(address)
+          get_and_retry_connection(address)
         end
 
-        def get_secret_with_retries(address)
+        def get_and_retry_connection(address)
           Vault.with_retries(Vault::HTTPConnectionError, attempts: config.retrieval_retries) do
             get_secret(address)
           end
         end
 
-        def renew_lease_with_authentication(address)
-          renew_lease_with_retries(address)
-        rescue Vault::HTTPClientError => e # if not authenticated, let's reauthenticate and try once more
-          raise unless e.code == 403
+        def renew_and_retry_auth(address)
+          renew_and_retry_connection(address)
+        rescue Vault::HTTPError => e # if not authenticated, let's reauthenticate and try once more
+          raise unless auth_error?(e)
 
           config.vault_initializer.call
-          renew_lease_with_retries(address)
+          renew_and_retry_connection(address)
         end
 
-        def renew_lease_with_retries(address)
+        def renew_and_retry_connection(address)
           Vault.with_retries(Vault::HTTPConnectionError, attempts: config.lease_renew_retries) do
             renew_lease(address)
           end
@@ -75,6 +75,10 @@ module SettingsReader
 
         def wrap_secret(address, secret)
           SettingsReader::VaultResolver::Entry.new(address, secret)
+        end
+
+        def auth_error?(error)
+          error.code == 403 || error.message =~ /token mac for token_version.*is incorrect/
         end
       end
     end
