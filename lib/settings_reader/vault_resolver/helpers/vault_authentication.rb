@@ -8,8 +8,9 @@ module SettingsReader
         FAKE_RESOLVER_PATH = 'vault/authentication'.freeze
 
         def authenticate_via_k8s(role, route: nil, service_token_path: nil)
-          params = URI.encode_www_form({ role: role, route: route, service_token_path: service_token_path }.compact)
-          resolver.resolve("vault://auth/kubernetes/login?#{params}#client_token", FAKE_RESOLVER_PATH)
+          params = { role: role, route: route, service_token_path: service_token_path, no_cache: true }
+          url_params = URI.encode_www_form(params.compact)
+          resolver.resolve("vault://auth/kubernetes/login?#{url_params}#client_token", FAKE_RESOLVER_PATH)
         end
 
         private

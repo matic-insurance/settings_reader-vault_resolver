@@ -73,6 +73,23 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
       end
     end
 
+    context 'when receiving auth error' do
+      let(:address) { 'vault://auth/kubernetes/login?role=test_role#client_token' }
+
+      before do
+        allow(Vault.auth).to receive(:kubernetes).and_raise(vault_auth_error)
+      end
+
+      it 'raising error' do
+        expect { get_value_from(address) }.to raise_error(SettingsReader::VaultResolver::Error)
+      end
+
+      it 'does not retries authentication' do
+        get_value_from(address) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
+        expect(Vault.auth).to have_received(:kubernetes).once
+      end
+    end
+
     protected
 
     def get_value_from(address)
@@ -99,6 +116,21 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
 
     it 'updates expiration' do
       expect { engine.renew(entry) }.to change(entry, :expires_in).to be_within(1).of(120)
+    end
+
+    context 'when receiving auth error' do
+      before do
+        allow(Vault.client.auth_token).to receive(:renew_self).and_raise(vault_auth_error)
+      end
+
+      it 'raising error' do
+        expect { engine.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error)
+      end
+
+      it 'does not retries authentication' do
+        engine.renew(entry) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
+        expect(Vault.client.auth_token).to have_received(:renew_self).once
+      end
     end
   end
 end

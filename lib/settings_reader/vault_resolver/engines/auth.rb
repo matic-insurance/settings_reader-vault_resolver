@@ -12,6 +12,16 @@ module SettingsReader
 
         protected
 
+        # Auth backend should not retry auth errors as it causing infinite recursion
+        def get_and_retry_auth(address)
+          get_and_retry_connection(address)
+        end
+
+        # Auth backend should not retry auth errors as it causing infinite recursion
+        def renew_and_retry_auth(address)
+          renew_and_retry_connection(address)
+        end
+
         def get_secret(address)
           return k8s_auth(address) if address.path == K8S_AUTH
 
