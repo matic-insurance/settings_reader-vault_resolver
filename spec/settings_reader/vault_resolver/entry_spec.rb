@@ -58,6 +58,40 @@ RSpec.describe SettingsReader::VaultResolver::Entry do
     end
   end
 
+  describe '#active?' do
+    subject { entry.active? }
+
+    context 'when secret is not renewable' do
+      before do
+        allow(secret).to receive(:renewable?).and_return(false)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when secret is leased' do
+      before do
+        entry
+        allow(secret).to receive(:renewable?).and_return(true)
+        allow(secret).to receive(:lease_duration).and_return(60)
+      end
+
+      it 'return false when lease not expired' do
+        Timecop.freeze do
+          Timecop.travel 59
+          is_expected.to be_truthy
+        end
+      end
+
+      it 'return true when lease expired' do
+        Timecop.freeze do
+          Timecop.travel 61
+          is_expected.to be_falsey
+        end
+      end
+    end
+  end
+
   describe '#expires_in' do
     subject { entry.expires_in }
 

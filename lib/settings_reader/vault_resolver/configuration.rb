@@ -34,6 +34,10 @@ module SettingsReader
       # Default: empty proc
       attr_accessor :vault_initializer
 
+      # Block to be executed when "lease not found" error is raised
+      # Default: empty proc
+      attr_accessor :lease_not_found_handler
+
       def initialize
         @logger = Logger.new($stdout, level: Logger::ERROR)
         @retrieval_retries = 2
@@ -43,6 +47,7 @@ module SettingsReader
         @lease_renew_error_listener = -> {}
         @lease_renew_success_listener = -> {}
         @vault_initializer = -> {}
+        @lease_not_found_handler = ->(_entry) {}
       end
 
       def setup_lease_refresher(cache, previous_task = nil)

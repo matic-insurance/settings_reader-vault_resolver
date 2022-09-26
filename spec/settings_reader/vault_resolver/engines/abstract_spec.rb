@@ -174,7 +174,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
 
         it 'raises exception' do
           message = /The Vault server at `test_address' is not currently/
-          expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error, message)
+          expect { backend.renew(entry) }.to raise_error(Vault::HTTPConnectionError, message)
         end
       end
 
@@ -186,7 +186,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
 
         it 'raises exception' do
           message = /The Vault server at `address' responded with a 503/
-          expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error, message)
+          expect { backend.renew(entry) }.to raise_error(Vault::HTTPError, message)
         end
       end
     end
@@ -223,7 +223,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
           allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 1))
         end
 
-        it { expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error) }
+        it { expect { backend.renew(entry) }.to raise_error(Vault::HTTPClientError) }
       end
 
       context 'when authentication exception is raised after reauthentication' do
@@ -238,11 +238,11 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
         let(:vault_initializer) { double(call: nil) }
 
         it 'reauthenticates' do
-          backend.renew(entry) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
+          backend.renew(entry) rescue Vault::HTTPClientError # rubocop:disable Style/RescueModifier
           expect(vault_initializer).to have_received(:call).once
         end
 
-        it { expect { backend.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error) }
+        it { expect { backend.renew(entry) }.to raise_error(Vault::HTTPClientError) }
       end
     end
   end

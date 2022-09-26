@@ -18,7 +18,7 @@ module SettingsReader
 
       def refresh
         info { 'Performing Vault leases refresh' }
-        promises = cache.entries.map do |entry|
+        promises = cache.active_entries.map do |entry|
           debug { "Checking lease for #{entry}. Leased?: #{entry.leased?}. Expires in: #{entry.expires_in}s" }
           refresh_entry(entry)
         end.compact
@@ -35,9 +35,26 @@ module SettingsReader
           info { "Lease renewed for #{entry}. Expires in: #{entry.expires_in}" }
           entry
         rescue StandardError => e
-          error { "Error refreshing lease for #{entry}: #{e.message}" }
-          raise SettingsReader::VaultResolver::Error, e.message
+          handle_refresh_error(e, entry)
         end
+      end
+
+      private
+
+      def handle_refresh_error(error, entry)
+        handle_lease_not_found(entry) if lease_not_found_error?(error)
+
+        error { "Error refreshing lease for #{entry}: #{error.message}" }
+        raise SettingsReader::VaultResolver::Error, error.message
+      end
+
+      def lease_not_found_error?(error)
+        error.is_a?(Vault::HTTPClientError) && error.code == 400 && error.message =~ /lease not found/
+      end
+
+      def handle_lease_not_found(entry)
+        cache.clear(entry)
+        config.lease_not_found_handler.call(entry)
       end
     end
   end

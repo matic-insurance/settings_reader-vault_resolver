@@ -10,7 +10,7 @@ RSpec.describe SettingsReader::VaultResolver::Configuration do
     context 'when executing task' do
       before do
         allow(Concurrent::TimerTask).to receive(:new).and_yield.and_return(task)
-        allow(cache).to receive(:entries).and_return []
+        allow(cache).to receive(:active_entries).and_return []
       end
 
       it 'does it without exceptions' do

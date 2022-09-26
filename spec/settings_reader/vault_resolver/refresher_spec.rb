@@ -3,12 +3,18 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
   let(:cache) { SettingsReader::VaultResolver::Cache.new }
   let(:entry) { entry_double(address: address_double(full_path: 'test')) }
+  let(:expired_entry) { entry_double(address: address_double(full_path: 'test1')) }
   let(:engine) { instance_double(SettingsReader::VaultResolver::Engines::Abstract, renew: true) }
 
   before do
+    allow(entry).to receive(:active?).and_return true
+    allow(expired_entry).to receive(:active?).and_return false
+
     current_config.lease_renew_delay = 200
     allow(current_config).to receive(:vault_engine_for).and_return(engine)
+
     cache.save(entry)
+    cache.save(expired_entry)
   end
 
   context 'with static secrets' do
@@ -82,6 +88,47 @@ RSpec.describe SettingsReader::VaultResolver::Refresher do
 
       it 'returns list of errors' do
         expect(refresher.refresh.map(&:reason)).to match([instance_of(SettingsReader::VaultResolver::Error)])
+      end
+    end
+
+    describe '"lease not found" exception' do
+      before do
+        allow(entry).to receive(:expires_in).and_return 190
+        current_config.lease_not_found_handler = lease_not_found_handler
+
+        error = error_type.new(message, double(code: code))
+        allow(engine).to receive(:renew).and_raise(error)
+
+        refresher.refresh
+      end
+
+      let(:lease_not_found_handler) { double(call: nil) }
+      let(:error_type) { Vault::HTTPClientError }
+      let(:code) { 400 }
+      let(:message) { 'lease not found 12345' }
+
+      it { expect(lease_not_found_handler).to have_received(:call).with(entry) }
+      it { expect(cache.entries).not_to include(entry) }
+
+      context 'when code is not 400' do
+        let(:code) { 401 }
+
+        it { expect(lease_not_found_handler).not_to have_received(:call) }
+        it { expect(cache.entries).to include(entry) }
+      end
+
+      context 'when message does not contain "lease not found"' do
+        let(:message) { 'message' }
+
+        it { expect(lease_not_found_handler).not_to have_received(:call) }
+        it { expect(cache.entries).to include(entry) }
+      end
+
+      context 'when error is not Vault::HTTPClientError' do
+        let(:error_type) { Vault::HTTPError }
+
+        it { expect(lease_not_found_handler).not_to have_received(:call) }
+        it { expect(cache.entries).to include(entry) }
       end
     end
   end
