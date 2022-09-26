@@ -23,6 +23,10 @@ module SettingsReader
         Time.now > @lease_started + lease_duration
       end
 
+      def active?
+        !expired?
+      end
+
       def expires_in
         return MONTH unless leased?
 

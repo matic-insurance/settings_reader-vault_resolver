@@ -29,8 +29,6 @@ module SettingsReader
           new_secret = renew_and_retry_auth(entry)
           entry.update_renewed(new_secret)
           true
-        rescue Vault::VaultError => e
-          raise SettingsReader::VaultResolver::Error, e.message
         end
 
         protected
@@ -50,18 +48,18 @@ module SettingsReader
           end
         end
 
-        def renew_and_retry_auth(address)
-          renew_and_retry_connection(address)
+        def renew_and_retry_auth(entry)
+          renew_and_retry_connection(entry)
         rescue Vault::HTTPError => e # if not authenticated, let's reauthenticate and try once more
           raise unless auth_error?(e)
 
           config.vault_initializer.call
-          renew_and_retry_connection(address)
+          renew_and_retry_connection(entry)
         end
 
-        def renew_and_retry_connection(address)
+        def renew_and_retry_connection(entry)
           Vault.with_retries(Vault::HTTPConnectionError, attempts: config.lease_renew_retries) do
-            renew_lease(address)
+            renew_lease(entry)
           end
         end
 

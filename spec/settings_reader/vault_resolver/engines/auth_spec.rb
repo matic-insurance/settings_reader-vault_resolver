@@ -80,11 +80,11 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
         allow(Vault.auth).to receive(:kubernetes).and_raise(vault_auth_error)
       end
 
-      it 'raising error' do
+      it 'raises error' do
         expect { get_value_from(address) }.to raise_error(SettingsReader::VaultResolver::Error)
       end
 
-      it 'does not retries authentication' do
+      it 'does not retry authentication' do
         get_value_from(address) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
         expect(Vault.auth).to have_received(:kubernetes).once
       end
@@ -123,12 +123,12 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Auth, :vault do
         allow(Vault.client.auth_token).to receive(:renew_self).and_raise(vault_auth_error)
       end
 
-      it 'raising error' do
-        expect { engine.renew(entry) }.to raise_error(SettingsReader::VaultResolver::Error)
+      it 'raises error' do
+        expect { engine.renew(entry) }.to raise_error(Vault::HTTPError)
       end
 
-      it 'does not retries authentication' do
-        engine.renew(entry) rescue SettingsReader::VaultResolver::Error # rubocop:disable Style/RescueModifier
+      it 'does not retry authentication' do
+        engine.renew(entry) rescue Vault::HTTPError # rubocop:disable Style/RescueModifier
         expect(Vault.client.auth_token).to have_received(:renew_self).once
       end
     end

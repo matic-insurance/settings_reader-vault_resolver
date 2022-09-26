@@ -36,6 +36,10 @@ module SettingsReader
         @secrets.each_value(&block)
       end
 
+      def active_entries(&block)
+        @secrets.values.select(&:active?).each(&block)
+      end
+
       def clear_all
         @secrets = {}
       end

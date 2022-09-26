@@ -5,7 +5,7 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
   let(:secret) { vault_secret_double(renewable?: nil) }
   let(:entry) { build_entry_for(address, secret) }
 
-  describe '.retrieve' do
+  describe '#retrieve' do
     subject(:result) { cache.retrieve(address) }
     context 'when static entry cached' do
       before { cache.save(entry) }
@@ -59,7 +59,7 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
     end
   end
 
-  describe '.fetch' do
+  describe '#fetch' do
     context 'when cached' do
       let(:fetch) { cache.fetch(address) { raise error_message } }
       let(:error_message) { 'eeee' }
@@ -98,5 +98,37 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
         expect(cache.retrieve(address)).to eq(entry)
       end
     end
+  end
+
+  describe '#entries' do
+    let(:address1) { address_for('vault://secret/key1#attribute') }
+    let(:secret1) { vault_secret_double(renewable?: nil) }
+    let(:entry1) { build_entry_for(address1, secret1) }
+    let(:address2) { address_for('vault://secret/key2#attribute2') }
+    let(:secret2) { vault_secret_double(renewable?: nil) }
+    let(:entry2) { build_entry_for(address2, secret2) }
+
+    before do
+      cache.save(entry1)
+      cache.save(entry2)
+    end
+
+    it { expect(cache.entries.to_a).to match_array([entry1, entry2]) }
+  end
+
+  describe '#active_entries' do
+    let(:address1) { address_for('vault://secret/key1#attribute') }
+    let(:secret1) { vault_secret_double(renewable?: nil) }
+    let(:entry1) { build_entry_for(address1, secret1) }
+    let(:address2) { address_for('vault://secret/key2#attribute2') }
+    let(:secret2) { vault_secret_double(renewable?: true, lease_duration: -1) }
+    let(:entry2) { build_entry_for(address2, secret2) }
+
+    before do
+      cache.save(entry1)
+      cache.save(entry2)
+    end
+
+    it { expect(cache.active_entries.to_a).to match_array([entry1]) }
   end
 end
