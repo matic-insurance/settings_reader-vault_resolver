@@ -1,10 +1,13 @@
 RSpec.describe SettingsReader::VaultResolver::RefresherObserver do
   let(:observer) { described_class.new(config) }
   let(:config) { SettingsReader::VaultResolver::Configuration.new }
-  let(:success_listener) { instance_double(Proc, call: true) }
-  let(:error_listener) { instance_double(Proc, call: true) }
+  let(:success_listener) { ->(_result) {} }
+  let(:error_listener) { ->(_result) {} }
 
   before do
+    allow(success_listener).to receive(:call).and_call_original
+    allow(error_listener).to receive(:call).and_call_original
+
     config.lease_renew_success_listener = success_listener
     config.lease_renew_error_listener = error_listener
   end
