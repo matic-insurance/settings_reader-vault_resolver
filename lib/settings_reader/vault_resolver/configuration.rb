@@ -44,8 +44,8 @@ module SettingsReader
         @lease_refresh_interval = 60
         @lease_renew_delay = 300
         @lease_renew_retries = 4
-        @lease_renew_error_listener = -> {}
-        @lease_renew_success_listener = -> {}
+        @lease_renew_error_listener = ->(_result) {}
+        @lease_renew_success_listener = ->(_result) {}
         @vault_initializer = -> {}
         @lease_not_found_handler = ->(_entry) {}
       end
