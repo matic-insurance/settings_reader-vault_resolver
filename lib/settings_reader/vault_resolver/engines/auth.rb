@@ -4,7 +4,8 @@ module SettingsReader
       # Adapter to retrieve / renew auth tokens
       class Auth < Abstract
         MOUNT = 'auth'.freeze
-        K8S_AUTH = 'kubernetes/login'.freeze
+        AUTH_BACKEND = ENV['VAULT_AUTH_BACKEND'] || 'kubernetes'
+        K8S_AUTH = "#{AUTH_BACKEND}/login".freeze
 
         def retrieves?(address)
           address.mount == MOUNT
