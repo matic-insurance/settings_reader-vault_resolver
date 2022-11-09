@@ -3,7 +3,7 @@ module Vault
   class Authenticate < Request
     def kubernetes(role, route: nil, service_token_path: nil)
       route ||= "/v1/auth/#{SettingsReader::VaultResolver::Engines::Auth::AUTH_BACKEND}/login"
-      service_token_path ||= '/var/run/secrets/kubernetes.io/serviceaccount/token'
+      service_token_path ||= '/var/run/secrets/tokens/dynamic-sa-token'
 
       payload = {
         role: role,
