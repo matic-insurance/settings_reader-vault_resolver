@@ -6,6 +6,10 @@ module SettingsReader
       # Default: Logger.new(STDOUT, level: Logger::ERROR)
       attr_accessor :logger
 
+      # What errors should be retried when connecting to vault
+      # Default: `Vault::HTTPConnectionError` and `OpenSSL::SSL::SSLError`
+      attr_accessor :retriable_errors
+
       # How many times to retry retrieval of the secret
       # Default: 2
       attr_accessor :retrieval_retries
@@ -40,6 +44,7 @@ module SettingsReader
 
       def initialize
         @logger = Logger.new($stdout, level: Logger::ERROR)
+        @retriable_errors = [OpenSSL::SSL::SSLError, Vault::HTTPConnectionError]
         @retrieval_retries = 2
         @lease_refresh_interval = 60
         @lease_renew_delay = 300
