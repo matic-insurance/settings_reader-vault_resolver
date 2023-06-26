@@ -47,6 +47,19 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
         end
       end
 
+      context 'when ssl connection exception happened less then retries' do
+        before do
+          error = OpenSSL::SSL::SSLError.new('SL_connect SYSCALL returned=5 errno=0 state=SSLv3/TLS write client hello')
+          allow(backend).to receive(:get_secret, &sporadic_exceptions(secret, error, result_after: 1))
+        end
+
+        it 'returns entry with secret' do
+          entry = backend.get(address)
+          expect(entry.address).to eq(address)
+          expect(entry.secret).to eq(secret)
+        end
+      end
+
       context 'when connection exception happened more then retries' do
         before do
           error = Vault::HTTPConnectionError.new('test_address', SocketError.new('test'))
@@ -155,9 +168,20 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
         allow(secret).to receive(:renewable?).and_return(true)
       end
 
-      context 'when connection exception happened less then retries' do
+      context 'when Vault connection exception happened less then retries' do
         before do
           error = Vault::HTTPConnectionError.new('test_address', SocketError.new('test'))
+          allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 3))
+        end
+
+        it 'secret is updated' do
+          expect { backend.renew(entry) }.to change(entry, :secret).to(renewed_secret)
+        end
+      end
+
+      context 'when SSL connection exception happened less then retries' do
+        before do
+          error = OpenSSL::SSL::SSLError.new('SL_connect SYSCALL returned=5 errno=0 state=SSLv3/TLS write client hello')
           allow(backend).to receive(:renew_lease, &sporadic_exceptions(renewed_secret, error, result_after: 3))
         end
 

@@ -43,7 +43,7 @@ module SettingsReader
         end
 
         def get_and_retry_connection(address)
-          Vault.with_retries(Vault::HTTPConnectionError, attempts: config.retrieval_retries) do
+          Vault.with_retries(*config.retriable_errors, attempts: config.retrieval_retries) do
             get_secret(address)
           end
         end
@@ -58,7 +58,7 @@ module SettingsReader
         end
 
         def renew_and_retry_connection(entry)
-          Vault.with_retries(Vault::HTTPConnectionError, attempts: config.lease_renew_retries) do
+          Vault.with_retries(*config.retriable_errors, attempts: config.lease_renew_retries) do
             renew_lease(entry)
           end
         end
