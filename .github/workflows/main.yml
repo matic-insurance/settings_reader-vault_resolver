@@ -14,6 +14,7 @@ jobs:
     env:
       VAULT_ADDR: 'http://127.0.0.1:8200'
       VAULT_TOKEN: 'vault_root_token'
+      DATABASE_ADDR: 'database'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,7 +27,7 @@ jobs:
         env:
           VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
           SKIP_SETCAP: true
-      db:
+      database:
         image: postgres:14.1-alpine
         ports:
           - "5432:5432"
