@@ -34,6 +34,11 @@ jobs:
           POSTGRES_USER: 'vault_root'
           POSTGRES_PASSWORD: 'root_password'
           POSTGRES_DB: 'app_db'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v1
