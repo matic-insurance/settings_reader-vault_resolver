@@ -9,6 +9,20 @@ on:
     - cron: '30 0 * * 1'
 
 jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.5
+          bundler-cache: true
+      - name: Run rubocop
+        run: bundle exec rubocop --parallel
+
   code-ql:
     name: Analyze
     runs-on: ubuntu-latest
