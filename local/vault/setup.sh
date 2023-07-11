@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+VAULT_ADDR=${VAULT_ADDR:-"http://127.0.0.1:8200"}
+DATABASE_ADDR=${DATABASE_ADDR:-"127.0.0.1"}
+
 message() {
   TEXT=$1
   echo "-----------------------------"
@@ -37,13 +40,13 @@ call_vault POST "v1/sys/mounts/database" '{"type": "database"}'
 
 message "Configuring database connection"
 call_vault POST "v1/database/config/app_db" \
-    '{
-       "plugin_name": "postgresql-database-plugin",
-       "allowed_roles": "app-user",
-       "connection_url": "postgresql://{{username}}:{{password}}@127.0.0.1:5432/app_db?sslmode=disable",
-       "username": "vault_root",
-       "password": "root_password"
-     }'
+    "{
+       \"plugin_name\": \"postgresql-database-plugin\",
+       \"allowed_roles\": \"app-user\",
+       \"connection_url\": \"postgresql://{{username}}:{{password}}@${DATABASE_ADDR}:5432/app_db?sslmode=disable\",
+       \"username\": \"vault_root\",
+       \"password\": \"root_password\"
+     }"
 
 message "Configuring database role"
 call_vault POST "v1/database/roles/app-user" \
