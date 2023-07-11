@@ -11,10 +11,29 @@ on:
 
 jobs:
   build:
+    env:
+      VAULT_ADDR: 'http://127.0.0.1:8200'
+      VAULT_TOKEN: 'vault_root_token'
     runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby: [ '2.5', '2.6', '2.7', '3.0' ]
+    services:
+      vault:
+        image: vault
+        ports:
+          - "8200:8200"
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
+          SKIP_SETCAP: true
+      db:
+        image: postgres:14.1-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: 'vault_root'
+          POSTGRES_PASSWORD: 'root_password'
+          POSTGRES_DB: 'app_db'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -24,6 +43,9 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+
+      - name: Set up Vault
+        run: sh local/vault/setup.sh
 
       - name: Run specs
         env:
