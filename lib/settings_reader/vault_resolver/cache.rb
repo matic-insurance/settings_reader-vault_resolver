@@ -23,8 +23,8 @@ module SettingsReader
       end
 
       def fetch(address, &block)
-        if !address.no_cache? && (exiting_entry = retrieve(address))
-          exiting_entry
+        if !address.no_cache? && (existing_entry = retrieve(address))
+          existing_entry
         else
           new_entry = block.call(address)
           save(new_entry) if new_entry

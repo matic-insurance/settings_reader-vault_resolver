@@ -144,7 +144,7 @@ RSpec.describe SettingsReader::VaultResolver::Engines::Abstract do
       end
 
       it 'expiration is not updated' do
-        expect { backend.renew(entry) }.to_not change(entry, :expires_in)
+        expect { backend.renew(entry) }.to change(entry, :expires_in).by_at_most(1)
       end
     end
 

@@ -19,7 +19,7 @@ module SettingsReader
       def refresh
         info { 'Performing Vault leases refresh' }
         promises = cache.active_entries.map do |entry|
-          debug { "Checking lease for #{entry}. Leased?: #{entry.leased?}. Expires in: #{entry.expires_in}s" }
+          debug { "Checking lease for #{entry}. Renewable?: #{entry.renewable?}. Expires in: #{entry.expires_in}s" }
           refresh_entry(entry)
         end.compact
         promises.each(&:wait)

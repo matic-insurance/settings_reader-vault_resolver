@@ -13,8 +13,12 @@ module SettingsReader
         @lease_started = Time.now
       end
 
-      def leased?
+      def renewable?
         @secret.renewable?
+      end
+
+      def leased?
+        renewable? || @secret.lease_duration
       end
 
       def expired?
