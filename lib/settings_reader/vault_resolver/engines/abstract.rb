@@ -24,7 +24,7 @@ module SettingsReader
         end
 
         def renew(entry)
-          return unless entry.leased?
+          return unless entry.renewable?
 
           new_secret = renew_and_retry_auth(entry)
           entry.update_renewed(new_secret)

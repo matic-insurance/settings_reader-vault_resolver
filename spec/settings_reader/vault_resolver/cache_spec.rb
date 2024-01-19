@@ -2,7 +2,7 @@ require 'timecop'
 RSpec.describe SettingsReader::VaultResolver::Cache do
   subject(:cache) { described_class.new }
   let(:address) { address_for('vault://secret/key#attribute') }
-  let(:secret) { vault_secret_double(renewable?: nil) }
+  let(:secret) { vault_secret_double(renewable?: nil, lease_duration: nil) }
   let(:entry) { build_entry_for(address, secret) }
 
   describe '#retrieve' do
@@ -118,7 +118,7 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
 
   describe '#active_entries' do
     let(:address1) { address_for('vault://secret/key1#attribute') }
-    let(:secret1) { vault_secret_double(renewable?: nil) }
+    let(:secret1) { vault_secret_double(renewable?: nil, lease_duration: nil) }
     let(:entry1) { build_entry_for(address1, secret1) }
     let(:address2) { address_for('vault://secret/key2#attribute2') }
     let(:secret2) { vault_secret_double(renewable?: true, lease_duration: -1) }
