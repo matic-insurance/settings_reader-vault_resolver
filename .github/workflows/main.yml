@@ -19,38 +19,38 @@ jobs:
     strategy:
       matrix:
         ruby: [ '2.7', '3.0', '3.3' ]
-    services:
-      vault:
-        image: hashicorp/vault
-        ports:
-          - "8200:8200"
-        env:
-          VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
-          SKIP_SETCAP: true
-      database:
-        image: postgres:14.1-alpine
-        ports:
-          - "5432:5432"
-        env:
-          POSTGRES_USER: 'vault_root'
-          POSTGRES_PASSWORD: 'root_password'
-          POSTGRES_DB: 'app_db'
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      aws:
-        image: localstack/localstack
-        ports:
-          - "127.0.0.1:4566:4566"            # LocalStack Gateway
-          - "127.0.0.1:4510-4559:4510-4559"  # external services port range
-        env:
-          DEBUG: 0
-        volumes:
-          - '/home/runner/work/settings_reader-vault_resolver/local/localstack/app-access-policy.json:/etc/localstack/init/ready.d/app-access-policy.json'
-          - '/home/runner/work/settings_reader-vault_resolver/local/localstack/app-assume-policy.json:/etc/localstack/init/ready.d/app-assume-policy.json'
-          - '/home/runner/work/settings_reader-vault_resolver/local/localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh'
+#    services:
+#      vault:
+#        image: hashicorp/vault
+#        ports:
+#          - "8200:8200"
+#        env:
+#          VAULT_DEV_ROOT_TOKEN_ID: vault_root_token
+#          SKIP_SETCAP: true
+#      database:
+#        image: postgres:14.1-alpine
+#        ports:
+#          - "5432:5432"
+#        env:
+#          POSTGRES_USER: 'vault_root'
+#          POSTGRES_PASSWORD: 'root_password'
+#          POSTGRES_DB: 'app_db'
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#      aws:
+#        image: localstack/localstack
+#        ports:
+#          - "127.0.0.1:4566:4566"            # LocalStack Gateway
+#          - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+#        env:
+#          DEBUG: 0
+#        volumes:
+#          - '/home/runner/work/settings_reader-vault_resolver/local/localstack/app-access-policy.json:/etc/localstack/init/ready.d/app-access-policy.json'
+#          - '/home/runner/work/settings_reader-vault_resolver/local/localstack/app-assume-policy.json:/etc/localstack/init/ready.d/app-assume-policy.json'
+#          - '/home/runner/work/settings_reader-vault_resolver/local/localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -61,8 +61,11 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
-      - name: Set up Vault
-        run: sh local/vault/setup.sh
+      - name: Start Dependencies
+        run: |
+          docker-compose up -d
+          echo "Waiting 15 seconds for initial configuraiton"
+          sleep 15
 
       - name: Run specs
         env:
