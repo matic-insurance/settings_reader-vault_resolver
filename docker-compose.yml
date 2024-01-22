@@ -8,6 +8,14 @@ services:
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: 'vault_root_token'
       SKIP_SETCAP: 'true'
+#  playground:
+#    image: hashicorp/vault
+#    command:
+#      - sleep
+#      - '10000000000'
+#    environment:
+#      VAULT_ADDR: 'http://aws:8200'
+#      VAULT_TOKEN: 'vault_root_token'
   db:
     image: postgres:14.1-alpine
     ports:
@@ -16,11 +24,24 @@ services:
       POSTGRES_USER: 'vault_root'
       POSTGRES_PASSWORD: 'root_password'
       POSTGRES_DB: 'app_db'
+  aws:
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      - './local/localstack/app-access-policy.json:/etc/localstack/init/ready.d/app-access-policy.json'
+      - './local/localstack/app-assume-policy.json:/etc/localstack/init/ready.d/app-assume-policy.json'
+      - './local/localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh'
   init:
     image: curlimages/curl
     depends_on:
       - vault
       - db
+      - aws
     volumes:
       - './local/vault/setup.sh:/etc/vault/setup.sh'
     environment:
