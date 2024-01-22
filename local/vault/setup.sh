@@ -25,6 +25,7 @@ call_vault() {
 }
 
 message "Setting up Vault"
+echo "Home Folder: $(pwd)"
 sleep 5
 
 message "Setting up static secret"
