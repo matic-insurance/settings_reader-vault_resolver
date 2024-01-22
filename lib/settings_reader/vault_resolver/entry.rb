@@ -18,7 +18,7 @@ module SettingsReader
       end
 
       def leased?
-        renewable? || @secret.lease_duration
+        renewable? || @secret.lease_duration&.positive?
       end
 
       def expired?
