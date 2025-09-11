@@ -23,7 +23,7 @@ RSpec.describe 'SettingsReader integration', :vault do
         expect(settings.get('resources/static_secret/missing_attribute')).to be_nil
       end
 
-      it 'raises error for unknown secret' do
+      it 'returns nil for unknown secret' do
         expect(settings.get('resources/static_secret/unknown_secret')).to be_nil
       end
 
