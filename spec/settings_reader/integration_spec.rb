@@ -20,11 +20,34 @@ RSpec.describe 'SettingsReader integration', :vault do
       end
 
       it 'returns nil for unknown attribute' do
-        expect(settings.get('resources/static_secret/missing_attribute')).to eq(nil)
+        expect(settings.get('resources/static_secret/missing_attribute')).to be_nil
       end
 
-      it 'returns nil for unknown secret' do
-        expect(settings.get('resources/static_secret/unknown_secret')).to eq(nil)
+      it 'raises error for unknown secret' do
+        expect(settings.get('resources/static_secret/unknown_secret')).to be_nil
+      end
+
+      context 'when raise_on_missing is enabled' do
+        before do
+          SettingsReader::VaultResolver.cache.raise_on_missing = true
+        end
+
+        after do
+          SettingsReader::VaultResolver.cache.raise_on_missing = false
+        end
+        it 'raises error for unknown attribute' do
+          expect do
+            settings.get('resources/static_secret/missing_attribute')
+          end.to raise_error(SettingsReader::VaultResolver::Error,
+                             %r{Secret not found at vault://secret/pre-configured#zzz})
+        end
+
+        it 'raises error for unknown secret' do
+          expect do
+            settings.get('resources/static_secret/unknown_secret')
+          end.to raise_error(SettingsReader::VaultResolver::Error,
+                             %r{Secret not found at vault://secret/deep/unknown#test})
+        end
       end
     end
 
