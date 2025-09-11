@@ -2,7 +2,10 @@ require 'timecop'
 RSpec.describe SettingsReader::VaultResolver::Cache do
   subject(:cache) { described_class.new }
   let(:address) { address_for('vault://secret/key#attribute') }
-  let(:secret) { vault_secret_double(renewable?: nil, lease_duration: nil) }
+  let(:secret) do
+    vault_secret_double(renewable?: nil, lease_duration: nil, data: { attribute: 'value' },
+                        to_h: { secret: {}, metadata: { 'y' => 'z' } })
+  end
   let(:entry) { build_entry_for(address, secret) }
 
   describe '#retrieve' do
@@ -96,6 +99,18 @@ RSpec.describe SettingsReader::VaultResolver::Cache do
       it 'saves entry to cache' do
         fetch
         expect(cache.retrieve(address)).to eq(entry)
+      end
+
+      context 'when raise_on_missing is enabled' do
+        subject(:cache) { described_class.new.tap { |c| c.raise_on_missing = true } }
+        let(:address) { address_for('vault://secret/key#another') }
+
+        it 'raises error' do
+          expect do
+            fetch
+          end.to raise_error(SettingsReader::VaultResolver::Error,
+                             "Secret not found at #{address}. Secret data: #{entry.secret.to_h}")
+        end
       end
     end
   end

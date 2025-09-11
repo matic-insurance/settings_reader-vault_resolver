@@ -7,7 +7,6 @@ module SettingsReader
       include Logging
 
       IDENTIFIER = 'vault://'.freeze
-      DATABASE_MOUNT = 'database'.freeze
 
       attr_reader :config
 
@@ -22,7 +21,7 @@ module SettingsReader
         value.start_with?(IDENTIFIER)
       end
 
-      # Expect value in format `vault://mount/path/to/secret?attribute_name`
+      # Expect value in format `vault://mount/path/to/secret#attribute_name`
       def resolve(value, _path)
         debug { "Resolving Vault secret at #{value}" }
         address = SettingsReader::VaultResolver::Address.new(value)
