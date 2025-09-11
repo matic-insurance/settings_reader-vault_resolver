@@ -13,8 +13,6 @@ GEM
     aws-eventstream (1.2.0)
     aws-sigv4 (1.4.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    codecov (0.6.0)
-      simplecov (>= 0.15, < 0.22)
     concurrent-ruby (1.1.9)
     diff-lcs (1.5.0)
     docile (1.4.0)
@@ -78,7 +76,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  codecov
   rake
   rspec
   rubocop
