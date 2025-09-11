@@ -63,7 +63,7 @@ jobs:
 
       - name: Start Dependencies
         run: |
-          docker-compose up -d
+          docker compose up -d
           echo "Waiting 15 seconds for initial configuraiton"
           sleep 15
 
