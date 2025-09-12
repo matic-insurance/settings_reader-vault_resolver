@@ -89,6 +89,8 @@ jobs:
           ruby-version: 2.7
           bundler-cache: false
 
+      - run: bundle install
+
       # - name: Get version
       #   run: echo "${GITHUB_REF/refs\/tags\//}" > release.tag
       - name: Set version
