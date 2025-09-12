@@ -42,7 +42,11 @@ module SettingsReader
       # Default: empty proc
       attr_accessor :lease_not_found_handler
 
-      def initialize
+      # Whether to raise error or return nil when secret or attribute is missing
+      # Default: false
+      attr_accessor :raise_error_on_missing_secret
+
+      def initialize # rubocop:disable Metrics/MethodLength
         @logger = Logger.new($stdout, level: Logger::ERROR)
         @retriable_errors = [OpenSSL::SSL::SSLError, Vault::HTTPConnectionError]
         @retrieval_retries = 2
@@ -53,6 +57,7 @@ module SettingsReader
         @lease_renew_success_listener = ->(_result) {}
         @vault_initializer = -> {}
         @lease_not_found_handler = ->(_entry) {}
+        @raise_error_on_missing_secret = false
       end
 
       def setup_lease_refresher(cache, previous_task = nil)
