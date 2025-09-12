@@ -87,13 +87,17 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7
-          bundler-cache: false
+          bundler-cache: true
 
-      - run: bundle install
 
       # - name: Get version
       #   run: echo "${GITHUB_REF/refs\/tags\//}" > release.tag
       - name: Set version
         run: sed -i "s/0.0.0/0.6.1/g" $(find . -name "version.rb")
 
-      - uses: rubygems/release-gem@v1
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+
+      - name: Build gem
+        run: gem build *.gemspec
+      - name: Push gem
+        run: gem push *.gem
