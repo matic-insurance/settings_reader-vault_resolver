@@ -3,9 +3,10 @@ RSpec.describe 'SettingsReader integration', :vault do
   let(:settings) do
     SettingsReader.load do |config|
       config.backends = [SettingsReader::Backends::YamlFile.new(settings_path)]
-      config.resolvers << SettingsReader::VaultResolver.resolver
+      config.resolvers << vault_resolver
     end
   end
+  let(:vault_resolver) { SettingsReader::VaultResolver.resolver }
 
   context 'when reading yml settings' do
     it 'returns value' do
@@ -29,12 +30,9 @@ RSpec.describe 'SettingsReader integration', :vault do
 
       context 'when raise_on_missing is enabled' do
         before do
-          SettingsReader::VaultResolver.cache.raise_on_missing = true
+          vault_resolver.config.raise_error_on_missing_secret = true
         end
 
-        after do
-          SettingsReader::VaultResolver.cache.raise_on_missing = false
-        end
         it 'raises error for unknown attribute' do
           expect do
             settings.get('resources/static_secret/missing_attribute')

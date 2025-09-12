@@ -16,9 +16,11 @@ module SettingsReader
         end
 
         def get(address)
-          return unless (vault_secret = get_and_retry_auth(address))
+          vault_secret = get_and_retry_auth(address)
+          entry = wrap_secret(address, vault_secret) if vault_secret
+          validate_secret!(entry, address) if config.raise_error_on_missing_secret
 
-          wrap_secret(address, vault_secret)
+          entry
         rescue Vault::VaultError => e
           raise SettingsReader::VaultResolver::Error, e.message
         end
@@ -77,6 +79,14 @@ module SettingsReader
 
         def auth_error?(error)
           error.code == 403 || error.message =~ /token mac for token_version.*is incorrect/
+        end
+
+        def validate_secret!(entry, address)
+          secret_value = entry&.value_for(address.attribute)
+          return if secret_value && !secret_value.empty?
+
+          raise SettingsReader::VaultResolver::Error,
+                "Secret not found at #{address}. Secret data: #{entry&.secret&.to_h}"
         end
       end
     end

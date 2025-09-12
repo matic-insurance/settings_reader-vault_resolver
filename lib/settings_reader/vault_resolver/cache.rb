@@ -2,8 +2,6 @@ module SettingsReader
   module VaultResolver
     # Secrets cache for seamless dynamic keys and renewal operations
     class Cache
-      attr_accessor :raise_on_missing
-
       def initialize
         @secrets = {}
       end
@@ -29,16 +27,7 @@ module SettingsReader
           existing_entry
         else
           new_entry = block.call(address)
-          secret_value = new_entry&.value_for(address.attribute)
-          if secret_value.nil? || secret_value.empty?
-            if raise_on_missing
-              raise SettingsReader::VaultResolver::Error,
-                    "Secret not found at #{address}. Secret data: #{new_entry&.secret&.to_h}"
-            end
-          elsif new_entry
-            save(new_entry)
-          end
-
+          save(new_entry) if new_entry
           new_entry
         end
       end
