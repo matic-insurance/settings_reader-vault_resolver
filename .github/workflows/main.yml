@@ -76,7 +76,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
     permissions:
-      contents: write
+      # contents: write
       id-token: write
 
     steps:
@@ -88,10 +88,10 @@ jobs:
         with:
           ruby-version: 2.7
           bundler-cache: true
-      
-      - name: Get version
-        run: echo "${GITHUB_REF/refs\/tags\//}" > release.tag
+
+      # - name: Get version
+      #   run: echo "${GITHUB_REF/refs\/tags\//}" > release.tag
       - name: Set version
-        run: sed -i "s/0.0.0/$(<release.tag)/g" $(find . -name "version.rb")
+        run: sed -i "s/0.0.0/0.6.1/g" $(find . -name "version.rb")
 
       - uses: rubygems/release-gem@v1
